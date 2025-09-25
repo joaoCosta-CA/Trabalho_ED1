@@ -1,0 +1,5 @@
+#ifndef GERENCIADOGEO_H
+#define GERENCIADORGEO_H
+
+
+#endif
