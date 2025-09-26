@@ -5,9 +5,9 @@
    aqruivo destina para todas as funções que gerenciam a criação e mudanças do objeto circulo 
 */
 
-typedef void* CIRCULO;
+typedef struct Circulo* CIRCULO;/*typedef de um ponteiro opaco para 'CIRCULO'*/
 
-CIRCULO CriarCirc(int id,int x, int y, double r, char* corb, char* corp);
+CIRCULO CriarCirc(int id,int x, int y, double r,const char* corb,const char* corp);
 /** 
  * @brief cria um circulo com os parametros fornecidos
  * @param id é um inteiro usado para identificar a forma criada
@@ -18,11 +18,17 @@ CIRCULO CriarCirc(int id,int x, int y, double r, char* corb, char* corp);
  * @param corp é a cor de preenchimento da área interior do circulo (ex:#000000)
 */
 
-CIRCULO CalcArea(double r);
-/**
- * @brief função criada para calcular a área total de uma circunferência 
- * @param 'r' será o valor do raio do circulo 
- */
+ /*-------grupo de função usados para acessar os valores do circulo criado---------*/
+ int getID(const CIRCULO c);
+ int getX(const CIRCULO c);
+ int getY(const CIRCULO c);
+ double getR(const CIRCULO c);
+ double getArea(const CIRCULO c);
+ const char* getCorb(const CIRCULO c);
+ const char* getCorp(const CIRCULO c);
+ /**/
+ /*----------------------------------------------------------------------*/
+ 
     
 
 
