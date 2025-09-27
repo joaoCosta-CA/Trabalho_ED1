@@ -5,7 +5,7 @@
    aqruivo destina para todas as funções que gerenciam a criação e mudanças do objeto circulo 
 */
 
-typedef struct Circulo* CIRCULO;/*typedef de um ponteiro opaco para 'CIRCULO'*/
+typedef void* CIRCULO;/*typedef de um ponteiro opaco para 'CIRCULO'*/
 
 CIRCULO CriarCirc(int id,int x, int y, double r,const char* corb,const char* corp);
 /** 
@@ -18,6 +18,12 @@ CIRCULO CriarCirc(int id,int x, int y, double r,const char* corb,const char* cor
  * @param corp é a cor de preenchimento da área interior do circulo (ex:#000000)
 */
 
+void DestruirCirc(CIRCULO c); 
+/**      
+ * @brief libera a memória alocada para o circulo
+ * @param c, ponteiro para o circulo a ser destruído
+ */
+
  /*-------grupo de função usados para acessar os valores do circulo criado---------*/
  int getID(const CIRCULO c);
  int getX(const CIRCULO c);
@@ -26,7 +32,6 @@ CIRCULO CriarCirc(int id,int x, int y, double r,const char* corb,const char* cor
  double getArea(const CIRCULO c);
  const char* getCorb(const CIRCULO c);
  const char* getCorp(const CIRCULO c);
- /**/
  /*----------------------------------------------------------------------*/
  
     
