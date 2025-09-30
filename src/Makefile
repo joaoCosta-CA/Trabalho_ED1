@@ -15,27 +15,25 @@ SRC_DIR = .
 
 # Diretório de cabeçalhos
 INC_DIR = .
-
-# Diretório de bibliotecas
 LIB_DIR = ./lib
 
-# Bibliotecas adicionais (use -lm para a biblioteca matemática, por exemplo)
+# Bibliotecas adicionais
 LIBS = -lm
 
-# Lista de arquivos de origem
-SRCS = $(wildcard $(SRC_DIR)/*.c)
+# Lista de arquivos de origem (SRC raiz + libs)
+SRCS = $(wildcard $(SRC_DIR)/*.c) $(wildcard $(LIB_DIR)/*/*.c)
 
 # Lista de arquivos de objeto
 OBJS = $(SRCS:.c=.o)
 
-# Incluir diretórios
-INC_FLAGS = -I$(INC_DIR)
+# Incluir diretórios (SRC raiz + libs)
+INC_FLAGS = -I$(INC_DIR) -I$(LIB_DIR)
 
 # Diretórios de bibliotecas
 LIB_FLAGS = -L$(LIB_DIR)
 
 # Regra de compilação dos arquivos de objeto
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.c
+%.o: %.c
 	$(CC) $(CFLAGS) $(INC_FLAGS) -c $< -o $@
 
 # Regra de compilação do executável
@@ -44,13 +42,13 @@ $(TARGET): $(OBJS)
 
 # Limpar arquivos intermediários e o executável
 clean:
-	rm -f $(SRC_DIR)/*.o $(TARGET)
+	rm -f $(SRC_DIR)/*.o $(LIB_DIR)/*/*.o $(TARGET)
 
 # Falso alvo para evitar conflitos com arquivos chamados "clean"
 .PHONY: clean
 
-pack: $(PROJ_NAME)
+pack: $(TARGET)
 	rm -f ../$(ALUNO).zip
 	echo $(ALUNO)
 	date >> .entrega
-	cd ..; zip $(ALUNO).zip -r src/*.c src/*.h src/Makefile LEIA-ME.txt .entrega	
+	cd ..; zip $(ALUNO).zip -r src/*.c src/*.h src/Makefile LEIA-ME.txt .entrega
