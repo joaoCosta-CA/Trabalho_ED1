@@ -6,10 +6,10 @@
 
 typedef struct{
     int id;
-    int x1;
-    int y1;
-    int x2;
-    int y2;
+    float x1;
+    float y1;
+    float x2;
+    float y2;
     double area;
     char corp[32];
     char corb[32];
@@ -25,7 +25,7 @@ static double CalcArea(const Linha* l){
     return 2.0 * comprimento;
 }
 
-LINHA criarLinha(int id, int x1, int y1, int x2, int y2, char* corp, char* corb){
+LINHA criarLinha(int id, float x1, float y1, float x2, float y2, char* corp, char* corb){
     Linha* l = (Linha*)malloc(sizeof(Linha));
     if(l == NULL){
         return NULL;

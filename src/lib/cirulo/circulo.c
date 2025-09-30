@@ -6,8 +6,8 @@
 
 typedef struct{
     int id;
-    int x;
-    int y;
+    float x;
+    float y;
     double r;
     double area;
     char corp[32];

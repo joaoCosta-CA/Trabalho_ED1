@@ -5,8 +5,8 @@
 
 typedef struct{
     int id;
-    int x;
-    int y;
+    float x;
+    float y;
     double w;
     double h;
     double area;
@@ -22,7 +22,7 @@ static double CalcArea(double w, double h){
     return w*h;
 }
 
-Retangulo criarRec(int id,int x, int y, double w, double h, char* corp, char* corb){
+Retangulo criarRec(int id, float x, float y, double w, double h, char* corp, char* corb){
     retangulo* r = (retangulo*)malloc(sizeof(retangulo));
     if(r == NULL){
         return NULL;
