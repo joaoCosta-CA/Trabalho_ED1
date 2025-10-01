@@ -68,7 +68,7 @@ FILA removeFila(FILA fila_g){
 }
 
 
-void fila_destruir(FILA fila_g) {
+void destruirFila(FILA fila_g) {
     Fila* fila = (Fila*)fila_g;
     if (fila == NULL) return;
 
@@ -79,7 +79,7 @@ void fila_destruir(FILA fila_g) {
     free(fila);
 }
 
-int fila_esta_vazia(const FILA fila_g) {
+int fila_vazia(const FILA fila_g) {
     const Fila* fila = (const Fila*)fila_g;
     if (fila == NULL) return 1;
     return fila->tamanho == 0;

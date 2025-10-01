@@ -22,7 +22,7 @@ static double CalcArea(double r){
 }
 
 
-CIRCULO CriarCirc(int id, int x, int y, double r, const char* corb, const char* corp){
+CIRCULO CriarCirc(int id, float x, float y, double r, const char* corb, const char* corp){
     Circulo* c = (Circulo*)malloc(sizeof(Circulo));
     if(c == NULL){
         return NULL;

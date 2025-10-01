@@ -49,9 +49,12 @@ PILHA pop(PILHA pilha_g){
     if(!pilha || pilha_vazia(pilha))return NULL;
 
     Node remove = pilha->topo;
+    void* dado_retorno = remove->valor;
     pilha->topo = remove->prox;
     free(remove);
     pilha->tamanho--;
+
+    return dado_retorno;
 }
 
 int pilha_tamanho(const PILHA pilha_g){

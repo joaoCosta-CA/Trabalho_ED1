@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "fila.h"
+#include "../fila/fila.h"
 
 // Funções internas (privadas ao módulo)
 static FILA carregar_linhas_para_fila(const char *caminho);
@@ -44,11 +44,11 @@ void dados_arquivo_destruir(DadosArquivo *dados) {
     if (!dados) return;
 
     if (dados->linhas) {
-        while (!filaVazia(dados->linhas)) {
-            char *linha = (char *)dequeueFila(dados->linhas);
+        while (!fila_vazia(dados->linhas)) {
+            char *linha = (char *)removeFila(dados->linhas);
             free(linha);
         }
-        desalocaFila(dados->linhas);
+        destruirFila(dados->linhas);
     }
 
     free(dados);
@@ -56,12 +56,12 @@ void dados_arquivo_destruir(DadosArquivo *dados) {
 
 // Lê o conteúdo de um arquivo e armazena em uma fila
 static FILA carregar_linhas_para_fila(const char *caminho) {
-    FILA f = criaFila();
+    FILA f = criarFila();
     if (!f) return NULL;
 
     FILE *fp = fopen(caminho, "r");
     if (!fp) {
-        desalocaFila(f);
+        destruirFila(f);
         return NULL;
     }
 
@@ -71,13 +71,13 @@ static FILA carregar_linhas_para_fila(const char *caminho) {
         if (!linha) {
             fprintf(stderr, "[ERRO] Não foi possível duplicar a linha\n");
             fclose(fp);
-            while (!filaVazia(f)) {
-                free(dequeueFila(f));
+            while (!fila_vazia(f)) {
+                free(removeFila(f));
             }
-            desalocaFila(f);
+            destruirFila(f);
             return NULL;
         }
-        enqueueFila(f, linha);
+        insertFila(f, linha);
     }
 
     fclose(fp);
