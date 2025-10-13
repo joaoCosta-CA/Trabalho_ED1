@@ -24,12 +24,14 @@ void destruirRec(Retangulo r);
  */
 
 /*----------Funções para acessar os valores do Retangulo criado------------*/
- int getIDr(const Retangulo r);/*pega o valor do id da forma*/
- double getW(const Retangulo r);/*pega o valor de largura 'w' do Retangulo criado*/
- double getH(const Retangulo r);/*pega o valor da altura 'h' do Retangulo criado*/
- const char* getCorp(const Retangulo r);/*pega uma string em hexa-decimal que irá ditar a cor de preenchimento*/
- const char* getCorb(const Retangulo r);/*pega uma string em hexa-decimal que irá ditar a cor de borda*/
- double getArear(const Retangulo r);/*pega o valor da área do retangulo criado*/
+ int retangulo_get_id(const Retangulo r);/*pega o valor do id da forma*/
+ float retangulo_get_x(const Retangulo r);/*pega o valor de x do Retangulo criado*/
+ float retangulo_get_y(const Retangulo r);/*pega o valor de y do Ret*/
+ double retangulo_get_larg(const Retangulo r);/*pega o valor de largura 'w' do Retangulo criado*/
+ double retangulo_get_altura(const Retangulo r);/*pega o valor da altura 'h' do Retangulo criado*/
+ const char* retangulo_get_corp(const Retangulo r);/*pega uma string em hexa-decimal que irá ditar a cor de preenchimento*/
+ const char* retangulo_get_corb(const Retangulo r);/*pega uma string em hexa-decimal que irá ditar a cor de borda*/
+ double retangulo_get_area(const Retangulo r);/*pega o valor da área do retangulo criado*/
  /*------------------------------------------------------------------------*/
 
 #endif

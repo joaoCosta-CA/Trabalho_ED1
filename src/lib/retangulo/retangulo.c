@@ -49,32 +49,44 @@ void destruirRec(Retangulo r_g){
     }
 }
 
+float retangulo_get_x(const Retangulo r_g){
+    const retangulo* r = (const retangulo*)r_g; 
+    if(r == NULL)return 0;
+    return r->x;
+}
 
-int getIDr(const Retangulo r_g){
+float retangulo_get_y(const Retangulo r_g){
+    const retangulo* r = (const retangulo*)r_g; 
+    if(r == NULL)return 0;
+    return r->y;
+}
+
+
+int retangulo_get_id(const Retangulo r_g){
     const retangulo* r = (const retangulo*)r_g; 
     if(r == NULL)return -1;
     return r->id;
 }
 
-double getW(const Retangulo r_g){
+double retangulo_get_larg(const Retangulo r_g){
     const retangulo* r = (const retangulo*)r_g; 
     if(r == NULL)return 0;
     return r->w;
 }
 
-double getH(const Retangulo r_g){
+double retangulo_get_altura(const Retangulo r_g){
     const retangulo* r = (const retangulo*)r_g; 
     if(r == NULL)return 0;
     return r->h;
 }
 
-const char* getCorp(const Retangulo r_g){
+const char* retangulo_get_corp(const Retangulo r_g){
     const retangulo* r = (const retangulo*)r_g; 
     if(r == NULL)return NULL;
     return r->corp;
 }
 
-const char* getCorb(const Retangulo r_g){
+const char* retangulo_get_corb(const Retangulo r_g){
     const retangulo* r = (const retangulo*)r_g; 
     if(r == NULL)return NULL;
     return r->corb;

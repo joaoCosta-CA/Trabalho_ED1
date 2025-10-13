@@ -1,61 +1,88 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "texto.h" // Inclui o cabeçalho com as declarações corretas
+#include "texto.h"
 
-// A capacidade dos arrays de caracteres, incluindo o espaço para o terminador nulo.
 #define TAMANHO_COR 30
 #define TAMANHO_CONTEUDO 256
 
-// Esta é a definição INTERNA e SECRETA da sua estrutura.
-// O nome "TextoStruct" é usado apenas DENTRO deste arquivo .c.
-// O usuário da biblioteca só conhece o tipo opaco "Texto" (void*).
 struct TextoStruct {
     int id;
     float x;
     float y;
-    char cor[TAMANHO_COR];
+    char corb[TAMANHO_COR];
+    char corp[TAMANHO_COR];
+    char ancora;
     char conteudo[TAMANHO_CONTEUDO];
 };
 
 // A assinatura da função agora corresponde exatamente à do arquivo .h
-Texto criar_texto(float x, float y, const char* cor, const char* conteudo, int id) {
+Texto criar_texto(int id, float x, float y, const char* corb, const char* corp, char ancora, const char* conteudo) {
     // Aloca memória para a estrutura interna.
     struct TextoStruct* novo_texto = malloc(sizeof(struct TextoStruct));
     if (!novo_texto) {
+        perror("Falha ao alocar memória para o texto");
         return NULL; // Retorna NULL se malloc falhar.
     }
 
-    // Atribui os valores.
+    // Atribui os valores numéricos e o caractere.
     novo_texto->id = id;
     novo_texto->x = x;
     novo_texto->y = y;
+    novo_texto->ancora = ancora;
 
-    // Copia as strings de forma segura.
-    snprintf(novo_texto->cor, TAMANHO_COR, "%s", cor ? cor : "");
+    snprintf(novo_texto->corb, TAMANHO_COR, "%s", corb ? corb : "");
+    snprintf(novo_texto->corp, TAMANHO_COR, "%s", corp ? corp : "");
     snprintf(novo_texto->conteudo, TAMANHO_CONTEUDO, "%s", conteudo ? conteudo : "");
 
     // Retorna o ponteiro para a estrutura como um ponteiro opaco 'Texto' (void*).
-    // A conversão de 'struct TextoStruct*' para 'void*' é implícita e segura.
     return novo_texto;
 }
 
-// A assinatura corresponde ao .h: recebe 'const Texto' (que é 'const void*')
 float area_texto(const Texto t) {
     if (!t) {
         return 0.0f;
     }
-    // Para usar os dados, precisamos converter o ponteiro opaco (void*) de volta
-    // para o tipo da nossa estrutura interna (struct TextoStruct*).
     const struct TextoStruct* texto_interno = (const struct TextoStruct*) t;
 
-    // A lógica de cálculo permanece a mesma.
     return 20.0f * (float)strlen(texto_interno->conteudo);
 }
 
-// A assinatura corresponde ao .h: recebe 'Texto' (que é 'void*')
 void liberar_texto(Texto t) {
-    // O ponteiro 't' (que é um void*) é o mesmo ponteiro que malloc retornou.
-    // A função free() aceita um void* diretamente.
     free(t);
+}
+
+int texto_get_id(const Texto t) {
+    if (!t) return -1;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    return texto->id;
+}
+
+float texto_get_x(const Texto t) {
+    if (!t) return 0.0f;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    return texto->x;
+}
+
+float tedxto_get_y(const Texto t) {
+    if (!t) return 0.0f;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    return texto->y;
+}
+
+// In texto.c
+char texto_get_ancora(Texto t) {
+    if (!t) return '\0'; // Return a null character for error/null input
+    
+    // Cast to your internal struct
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    
+    // Return the character value directly
+    return texto->ancora;
+}
+
+const char* texto_get_corb(const Texto t) {
+    if (!t) return NULL;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    return texto->corb;
 }

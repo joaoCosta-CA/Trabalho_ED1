@@ -19,7 +19,7 @@ typedef void *Texto;
  * @return Um ponteiro opaco 'Texto' (void*) para o objeto criado,
  * ou NULL se a alocação de memória falhar.
  */
-Texto criar_texto(float x, float y, const char* cor, const char* conteudo, int id);
+Texto criar_texto(int id, float x, float y, const char* corb, const char* corp, char ancora, const char* conteudo);
 
 /**
  * @brief Calcula e retorna a "área" ocupada pelo texto.
@@ -35,6 +35,18 @@ float area_texto(const Texto t);
  *
  * @param t O ponteiro opaco 'Texto' a ser liberado.
  */
-void liberar_texto(Texto t);
+void destruirTexto(Texto t);
 
-#endif // TEXTO_H
+
+/* Funções para acessar os valores do Texto criado */
+int texto_get_id(const Texto t);
+float texto_get_x(const Texto t);
+float texto_get_y(const Texto t);
+char texto_get_ancora(const Texto t);
+const char *texto_get_corb(const Texto t);
+const char *texto_get_corp(const Texto t);
+const char *texto_get_conteudo(const Texto t);
+/*------------------------------------------------*/
+
+
+#endif

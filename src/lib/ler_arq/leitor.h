@@ -16,7 +16,7 @@
 /**
  * @brief Estrutura que representa um arquivo lido, contendo seu caminho, nome e as linhas em uma fila.
  */
-typedef struct DadosArquivo DadosArquivo;
+typedef void *DadosArquivo;
 
 /**
  * @brief Cria uma nova instância de DadosArquivo, lendo o conteúdo do arquivo especificado.
@@ -24,14 +24,14 @@ typedef struct DadosArquivo DadosArquivo;
  * @param caminho_arquivo Caminho completo do arquivo a ser lido.
  * @return Ponteiro para DadosArquivo criado, ou NULL em caso de erro.
  */
-DadosArquivo *dados_arquivo_criar(const char *caminho_arquivo);
+DadosArquivo dados_arquivo_criar(const char *caminho_arquivo);
 
 /**
  * @brief Libera a memória alocada para DadosArquivo e todas as linhas armazenadas.
  *
  * @param dados Ponteiro para DadosArquivo a ser destruído.
  */
-void dados_arquivo_destruir(DadosArquivo *dados);
+void dados_arquivo_destruir(DadosArquivo dados);
 
 /**
  * @brief Obtém o caminho completo do arquivo armazenado em DadosArquivo.
@@ -39,7 +39,7 @@ void dados_arquivo_destruir(DadosArquivo *dados);
  * @param dados Ponteiro para DadosArquivo.
  * @return Ponteiro constante para a string com o caminho do arquivo.
  */
-const char *obter_caminho_arquivo(const DadosArquivo *dados);
+const char *obter_caminho_arquivo(const DadosArquivo dados);
 
 /**
  * @brief Obtém o nome do arquivo (apenas o nome, sem o caminho).
@@ -47,7 +47,7 @@ const char *obter_caminho_arquivo(const DadosArquivo *dados);
  * @param dados Ponteiro para DadosArquivo.
  * @return Ponteiro constante para a string com o nome do arquivo.
  */
-const char *obter_nome_arquivo(const DadosArquivo *dados);
+const char *obter_nome_arquivo(const DadosArquivo dados);
 
 /**
  * @brief Obtém a fila contendo as linhas do arquivo.
@@ -58,6 +58,6 @@ const char *obter_nome_arquivo(const DadosArquivo *dados);
  * @param dados Ponteiro para DadosArquivo.
  * @return Ponteiro para Fila contendo as linhas do arquivo.
  */
-FILA obter_fila_linhas(const DadosArquivo *dados);
+FILA obter_fila_linhas(const DadosArquivo dados);
 
 #endif // LEITOR_H

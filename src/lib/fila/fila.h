@@ -4,6 +4,7 @@
 /*Arquivo destina para a criação de todos os cabeçalhos das funções destinadas para filas*/
 
 typedef void* FILA;
+typedef void* IteradorFila;
 
 FILA criarFila();
 /**
@@ -43,5 +44,32 @@ void insertFila(FILA fila, void* valor);
      * @param 'fila' será a fila que terá o tamanho verficado
      * @return retorna o tamanho da fila
      */
+
+     /**
+ * @brief Cria um iterador para percorrer a fila sem modificá-la.
+ * @param fila A fila que será percorrida.
+ * @return Um ponteiro para a estrutura do iterador.
+ */
+IteradorFila fila_obter_iterador(FILA fila);
+
+/**
+ * @brief Verifica se o iterador ainda possui um próximo elemento para visitar.
+ * @param iterador O iterador da fila.
+ * @return Retorna 1 (verdadeiro) se houver um próximo elemento, 0 (falso) caso contrário.
+ */
+int iterador_tem_proximo(IteradorFila iterador);
+
+/**
+ * @brief Retorna o próximo elemento da fila e avança o iterador.
+ * @param iterador O iterador da fila.
+ * @return Um ponteiro para o dado do próximo elemento na fila.
+ */
+void* iterador_obter_proximo(IteradorFila iterador);
+
+/**
+ * @brief Libera a memória alocada para o iterador.
+ * @param iterador O iterador a ser destruído.
+ */
+void iterador_destruir(IteradorFila iterador);
 
 #endif

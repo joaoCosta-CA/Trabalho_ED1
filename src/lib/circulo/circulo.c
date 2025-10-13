@@ -12,7 +12,7 @@ typedef struct{
     double area;
     char corp[32];
     char corb[32];
-}Circulo;
+}circulo;
 
 static double CalcArea(double r){
     if(r<0){
@@ -22,8 +22,8 @@ static double CalcArea(double r){
 }
 
 
-CIRCULO CriarCirc(int id, float x, float y, double r, const char* corb, const char* corp){
-    Circulo* c = (Circulo*)malloc(sizeof(Circulo));
+Circulo CriarCirc(int id, float x, float y, double r, const char* corb, const char* corp){
+    circulo* c = (circulo*)malloc(sizeof(circulo));
     if(c == NULL){
         return NULL;
     }
@@ -40,45 +40,45 @@ CIRCULO CriarCirc(int id, float x, float y, double r, const char* corb, const ch
     return c;
 }
 
-void DestruirCirc(CIRCULO c_g){
-    Circulo* c = (Circulo*)c_g;
+void DestruirCirc(Circulo c_g){
+    circulo* c = (circulo*)c_g;
     if(c != NULL){
         free(c);
     }
 }
 
-int circulo_get_id(const CIRCULO c_g) {
-    const Circulo* c = (const Circulo*)c_g;
+int circulo_get_id(const Circulo c_g) {
+    const circulo* c = (const circulo*)c_g;
     return (c != NULL) ? c->id : -1;
 }
 
-int circulo_get_x(const CIRCULO c_g) {
-    const Circulo* c = (const Circulo*)c_g;
+float circulo_get_x(const Circulo c_g) {
+    const circulo* c = (const circulo*)c_g;
     return (c != NULL) ? c->x : 0;
 }
 
-int circulo_get_y(const CIRCULO c_g) {
-    const Circulo* c = (const Circulo*)c_g;
+float circulo_get_y(const Circulo c_g) {
+    const circulo* c = (const circulo*)c_g;
     return (c != NULL) ? c->y : 0;
 }
 
-double circulo_get_raio(const CIRCULO c_g) {
-    const Circulo* c = (const Circulo*)c_g;
+double circulo_get_raio(const Circulo c_g) {
+    const circulo* c = (const circulo*)c_g;
     return (c != NULL) ? c->r : 0.0;
 }
 
-double circulo_get_area(const CIRCULO c_g) {
-    const Circulo* c = (const Circulo*)c_g;
+double circulo_get_area(const Circulo c_g) {
+    const circulo* c = (const circulo*)c_g;
     return (c != NULL) ? c->area : 0.0;
 }
 
-const char* circulo_get_corb(const CIRCULO c_g) {
-    const Circulo* c = (const Circulo*)c_g;
+const char* circulo_get_corb(const Circulo c_g) {
+    const circulo* c = (const circulo*)c_g;
     return (c != NULL) ? c->corb : "invalido";
 }
 
-const char* circulo_get_corp(const CIRCULO c_g) {
-    const Circulo* c = (const Circulo*)c_g;
+const char* circulo_get_corp(const Circulo c_g) {
+    const circulo* c = (const circulo*)c_g;
     return (c != NULL) ? c->corp : "invalido";
 }
 

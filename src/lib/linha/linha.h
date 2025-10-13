@@ -1,14 +1,14 @@
 #ifndef LINHA_H
 #define LINHA_H
 
-typedef void* LINHA;
+typedef void* Linha;
 
 
 /*
     arquivo destina para a organização de todas as funções e modificações para a forma linha
 */
 
-LINHA criarLinha(int id, float x1, float y1, float x2, float y2, char* corp, char* corb);
+Linha criarLinha(int id, float x1, float y1, float x2, float y2, char *cor);
 /**
  * @brief cria uma linha com os pontos (x1,y1) e (x2,y2)
  * @param id, um valor int que identifica a linha criada
@@ -20,7 +20,7 @@ LINHA criarLinha(int id, float x1, float y1, float x2, float y2, char* corp, cha
  * @param corb, é a cor que a borda da linha deverá ter
  */
 
- void destruirLinha(LINHA l);
+ void destruirLinha(Linha l);
 /**
  * @brief libera a memória alocada para a linha
  * @param l, ponteiro para a linha a ser destruída
@@ -28,14 +28,13 @@ LINHA criarLinha(int id, float x1, float y1, float x2, float y2, char* corp, cha
 
 
  /*--------------Funções para acessar todos os parametros da Linha ----------------------*/
- int getIDl(const LINHA l);
- int getX1(const LINHA l);
- int getX2(const LINHA l);
- int getY1(const LINHA l);
- int getY2(const LINHA l);
- double getArea(const LINHA l);
- const char* getCorp(const LINHA l);
- const char* getCorb(const LINHA l);
+ int linha_get_id(const Linha l);
+ float linha_get_x1(const Linha l);
+ float linha_get_x2(const Linha l);
+ float linha_get_y1(const Linha l);
+ float linha_get_y2(const Linha l);
+ double linha_get_area(const Linha l);
+ const char* linha_get_cor(const Linha l);
  /*---------------------------------------------------------------------------------------*/
 
 #endif
