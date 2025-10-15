@@ -38,7 +38,7 @@ float area_texto(const Texto t);
 void destruirTexto(Texto t);
 
 
-/* Funções para acessar os valores do Texto criado */
+/*---------------FUNÇÕES GETTERS-------------------*/
 int texto_get_id(const Texto t);
 float texto_get_x(const Texto t);
 float texto_get_y(const Texto t);
@@ -46,7 +46,13 @@ char texto_get_ancora(const Texto t);
 const char *texto_get_corb(const Texto t);
 const char *texto_get_corp(const Texto t);
 const char *texto_get_conteudo(const Texto t);
-/*------------------------------------------------*/
+
+/*---------------FUNÇÕES SETTERS-------------------*/
+void texto_set_x(Texto t, float x);
+void texto_set_y(Texto t, float y);
+void texto_set_corp(Texto t, const char* corp);
+void texto_set_corb(Texto t, const char* corb);
+void texto_set_conteudo(Texto t, const char* conteudo);
 
 
 #endif

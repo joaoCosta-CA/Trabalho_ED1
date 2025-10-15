@@ -24,7 +24,8 @@ void DestruirCirc(Circulo c);
  * @param c, ponteiro para o circulo a ser destruído
  */
 
- /*-------grupo de função usados para acessar os valores do circulo criado---------*/
+ /*-------FUNÇÕES GETTERS---------*/
+
  int circulo_get_id(const Circulo c);
  float circulo_get_x(const Circulo c);
  float circulo_get_y(const Circulo c);
@@ -32,6 +33,19 @@ void DestruirCirc(Circulo c);
  double circulo_get_area(const Circulo c);
  const char* circulo_get_corb(const Circulo c);
  const char* circulo_get_corp(const Circulo c);
- /*----------------------------------------------------------------------*/
+
+ /*---------------------------------*/
+
+ /*-------FUNÇÕES SETTERS---------*/
+
+ void circulo_set_x(Circulo c, float x);
+ void circulo_set_y(Circulo c, float y);
+ void circulo_set_corp(Circulo c, char* corp);
+ void circulo_set_corb(Circulo c, char* corb);
+
+ /*--------------------------------*/
+
+
+
 
 #endif

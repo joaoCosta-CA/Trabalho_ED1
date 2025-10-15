@@ -23,15 +23,44 @@ void destruirRec(Retangulo r);
  * @param r, ponteiro para o retangulo a ser destruído
  */
 
-/*----------Funções para acessar os valores do Retangulo criado------------*/
- int retangulo_get_id(const Retangulo r);/*pega o valor do id da forma*/
- float retangulo_get_x(const Retangulo r);/*pega o valor de x do Retangulo criado*/
- float retangulo_get_y(const Retangulo r);/*pega o valor de y do Ret*/
- double retangulo_get_larg(const Retangulo r);/*pega o valor de largura 'w' do Retangulo criado*/
- double retangulo_get_altura(const Retangulo r);/*pega o valor da altura 'h' do Retangulo criado*/
- const char* retangulo_get_corp(const Retangulo r);/*pega uma string em hexa-decimal que irá ditar a cor de preenchimento*/
- const char* retangulo_get_corb(const Retangulo r);/*pega uma string em hexa-decimal que irá ditar a cor de borda*/
- double retangulo_get_area(const Retangulo r);/*pega o valor da área do retangulo criado*/
- /*------------------------------------------------------------------------*/
+/*----------FUNÇÕES GETTERS------------*/
+
+// Retorna o valor do id da forma
+int retangulo_get_id(const Retangulo r);
+
+// Retorna o valor de x do Retangulo criado
+float retangulo_get_x(const Retangulo r);
+
+// Retorna o valor de y do Retangulo criado
+float retangulo_get_y(const Retangulo r);
+
+// Retorna o valor da largura 'w' do Retangulo criado
+double retangulo_get_larg(const Retangulo r);
+
+// Retorna o valor da altura 'h' do Retangulo criado
+double retangulo_get_altura(const Retangulo r);
+
+// Retorna uma string em hexadecimal que indica a cor de preenchimento
+const char* retangulo_get_corp(const Retangulo r);
+
+// Retorna uma string em hexadecimal que indica a cor da borda
+const char* retangulo_get_corb(const Retangulo r);
+
+// Retorna o valor da área do retangulo criado
+double retangulo_get_area(const Retangulo r);
+
+/*-----------FUNÇÕES SETTERS-----------------*/
+
+// Define o valor de x do retângulo
+void retangulo_set_x(Retangulo r, float x);
+
+// Define o valor de y do retângulo
+void retangulo_set_y(Retangulo r, float y);
+
+// Define a cor de preenchimento do retângulo
+void retangulo_set_corp(Retangulo r, char* corp);
+
+// Define a cor da borda do retângulo
+void retangulo_set_corb(Retangulo r, char* corb);
 
 #endif

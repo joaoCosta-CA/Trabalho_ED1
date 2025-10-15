@@ -1,26 +1,41 @@
 #include "argumentos.h"
-#include <string.h>  
 
-/*
- * Implementação da função get_option.
- */
-char* get_option(int argc, char *argv[], char* option_name) {
-    // validação para evitar falhas caso argv ou option_name sejam nulos.
-    if (!argv || !option_name) {
-        return NULL;
-    }
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-    // O laço começa em 1 para pular o nome do programa (argv[0]).
-    // A condição 'i < argc - 1' garante que sempre exista um argv[i + 1] para ser retornado.
-    for (int i = 1; i < argc - 1; i++) {
-        // Verifica se o argumento atual começa com '-'.
-        // Compara o resto do argumento (a partir do segundo caractere) com option_name.
-        if (argv[i][0] == '-' && strcmp(&argv[i][1], option_name) == 0) {
-            // Se encontrou a opção, retorna o próximo argumento como seu valor.
+// Retorna o valor associado a uma opção no formato -opt valorOpcao
+char *get_option_value(int argc, char *argv[], char *opt_name) {
+    for (int i = 1; i < argc - 1; ++i) {
+        if (argv[i][0] == '-' && strcmp(argv[i] + 1, opt_name) == 0) {
             return argv[i + 1];
         }
     }
+    return NULL;
+}
 
-    // Se o laço terminar sem encontrar a opção, retorna NULL.
+// Retorna o sufixo do comando (último argumento que não começa com '-')
+char *get_command_suffix(int argc, char *argv[]) {
+    char *suffix = NULL;
+    int suffix_count = 0;
+
+    for (int i = 1; i < argc; ++i) {
+        // Ignora pares -opt valor
+        if (argv[i][0] == '-') {
+            if (i + 1 < argc && argv[i + 1][0] != '-') {
+                ++i; // pula o valor da opção
+            }
+        } else {
+            suffix = argv[i];
+            ++suffix_count;
+        }
+    }
+
+    if (suffix_count == 1) {
+        return suffix;
+    } else if (suffix_count > 1) {
+        printf("Erro: Mais de um sufixo\n");
+        exit(1);
+    }
     return NULL;
 }

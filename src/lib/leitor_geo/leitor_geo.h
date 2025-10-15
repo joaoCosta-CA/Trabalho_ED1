@@ -1,11 +1,3 @@
-/**
- * @file processador_geo.h
- * @brief Módulo para processar comandos de um arquivo .geo e gerenciar formas geométricas.
- *
- * Este módulo é responsável por ler as especificações de formas (círculos, retângulos, etc.)
- * a partir de um arquivo .geo, criar as estruturas de dados correspondentes e organizá-las
- * em uma coleção principal, aqui chamada de "Chao".
- */
 #ifndef LEITOR_GEO_H
 #define LEITOR_GEO_H
 #include "../ler_arq/leitor.h"
@@ -30,8 +22,7 @@ typedef void *Chao;
  * @param sufixo_comando Um sufixo opcional a ser adicionado ao nome dos arquivos de saída.
  * @return Um ponteiro do tipo Chao para a coleção de formas criadas, ou NULL em caso de erro.
  */
-Chao processar_arquivo_geo(DadosArquivo dados_arquivo, const char *caminho_saida,
-                           const char *sufixo_comando);
+Chao processar_arquivo_geo(DadosArquivo dados_arquivo, const char *caminho_saida,const char *sufixo_comando);
 
 /**
  * @brief Libera toda a memória associada ao "Chao" e às formas que ele contém.

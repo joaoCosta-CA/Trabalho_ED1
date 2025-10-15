@@ -70,14 +70,11 @@ float tedxto_get_y(const Texto t) {
     return texto->y;
 }
 
-// In texto.c
 char texto_get_ancora(Texto t) {
-    if (!t) return '\0'; // Return a null character for error/null input
+    if (!t) return '\0';
     
-    // Cast to your internal struct
     struct TextoStruct* texto = (struct TextoStruct*)t;
     
-    // Return the character value directly
     return texto->ancora;
 }
 
@@ -85,4 +82,34 @@ const char* texto_get_corb(const Texto t) {
     if (!t) return NULL;
     struct TextoStruct* texto = (struct TextoStruct*)t;
     return texto->corb;
+}
+
+void texto_set_corb(Texto t, const char* corb){
+    if (!t || !corb) return;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    snprintf(texto->corb, TAMANHO_COR, "%s", corb);
+}
+
+void texto_set_corp(Texto t, const char* corp){
+    if (!t || !corp) return;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    snprintf(texto->corp, TAMANHO_COR, "%s", corp);
+}
+
+void texto_set_conteudo(Texto t, const char* conteudo){
+    if (!t || !conteudo) return;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    snprintf(texto->conteudo, TAMANHO_CONTEUDO, "%s", conteudo);
+}
+
+void texto_set_x(Texto t, float x){
+    if (!t) return;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    texto->x = x;
+}
+
+void texto_set_y(Texto t, float y){
+    if (!t) return;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    texto->y = y;
 }

@@ -89,3 +89,40 @@ const char* linha_get_cor(const Linha l_g){
     if(l == NULL) return NULL;
     return l->cor;
 }
+
+void linha_set_x1(Linha l_g, float x1){
+    linha* l = (linha*)l_g;
+    if(l != NULL){
+        l->x1 = x1;
+    }
+}
+
+void linha_set_y1(Linha l_g, float y1){
+    linha* l = (linha*)l_g;
+    if(l != NULL){
+        l->y1 = y1;
+    }
+}
+
+void linha_set_x2(Linha l_g, float x2){
+    linha* l = (linha*)l_g;
+    if(l != NULL){
+        l->x2 = x2;
+    }
+}
+
+void linha_set_y2(Linha l_g, float y2){
+    linha* l = (linha*)l_g;
+    if(l != NULL){
+        l->y2 = y2;
+    }
+}
+
+
+void linha_set_cor(Linha l_g, char* cor){
+    linha* l = (linha*)l_g;
+    if(l != NULL){
+        strncpy(l->cor, cor, sizeof(l->cor) - 1);
+        l->cor[sizeof(l->cor) - 1] = '\0';
+    }
+}

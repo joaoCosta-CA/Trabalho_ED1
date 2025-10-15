@@ -45,6 +45,7 @@ void DestruirCirc(Circulo c_g){
     if(c != NULL){
         free(c);
     }
+    return;
 }
 
 int circulo_get_id(const Circulo c_g) {
@@ -80,5 +81,35 @@ const char* circulo_get_corb(const Circulo c_g) {
 const char* circulo_get_corp(const Circulo c_g) {
     const circulo* c = (const circulo*)c_g;
     return (c != NULL) ? c->corp : "invalido";
+}
+
+void set_circulo_x(Circulo c_g, float x){
+    circulo* c = (circulo*)c_g;
+    if(c != NULL){
+        c->x = x;
+    };
+}
+
+void set_circulo_y(Circulo c_g, float y){
+    circulo* c = (circulo*)c_g;
+    if(c != NULL){
+        c->y = y;
+    }
+}
+
+void set_circulo_corp(Circulo c_g, char* corP){
+    circulo* c = (circulo*)c_g;
+    if(c != NULL && corP != NULL){
+        strncpy(c->corb, corP, sizeof(c->corb) - 1);
+        c->corb[sizeof(c->corb) - 1] = '\0';
+    }
+}
+
+void set_circulo_corb(Circulo c_g, char* corB){
+    circulo* c = (circulo*)c_g;
+    if(c != NULL && corB != NULL){
+        strncpy(c->corb, corB, sizeof(c->corb) - 1);
+        c->corb[sizeof(c->corb) - 1] = '\0';
+    }
 }
 

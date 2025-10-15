@@ -90,11 +90,9 @@ void dados_arquivo_destruir(DadosArquivo dados) {
 const char *obter_nome_arquivo(DadosArquivo dados) {
     if (!dados) return NULL;
 
-    // A MÁGICA ACONTECE AQUI:
     // Cast do ponteiro genérico 'dados' para o tipo da struct interna.
     LeitorInfo* info = (LeitorInfo*)dados;
     
-    // Agora você pode usar o '->' com segurança!
     return info->nome_arquivo;
 }
 

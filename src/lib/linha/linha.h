@@ -27,14 +27,44 @@ Linha criarLinha(int id, float x1, float y1, float x2, float y2, char *cor);
  */
 
 
- /*--------------Funções para acessar todos os parametros da Linha ----------------------*/
- int linha_get_id(const Linha l);
- float linha_get_x1(const Linha l);
- float linha_get_x2(const Linha l);
- float linha_get_y1(const Linha l);
- float linha_get_y2(const Linha l);
- double linha_get_area(const Linha l);
- const char* linha_get_cor(const Linha l);
- /*---------------------------------------------------------------------------------------*/
+ /*--------------FUNCÇÕES GETTERS ----------------------*/
+
+// Retorna o id da linha
+int linha_get_id(const Linha l);
+
+// Retorna x1 do primeiro ponto
+float linha_get_x1(const Linha l);
+
+// Retorna y1 do primeiro ponto
+float linha_get_y1(const Linha l);
+
+// Retorna x2 do segundo ponto
+float linha_get_x2(const Linha l);
+
+// Retorna y2 do segundo ponto
+float linha_get_y2(const Linha l);
+
+// Retorna a área da linha (geralmente zero)
+double linha_get_area(const Linha l);
+
+// Retorna a cor da linha
+const char* linha_get_cor(const Linha l);
+
+ /*--------------FUNÇÕES SETTERS ----------------------*/
+
+ //define o valor de x1 para a linha
+ void linha_set_x1(Linha l, float x1);
+
+ //define o valor de y1 para a linha
+ void linha_set_y1(Linha l, float y1);
+
+//define o valor de x2 para a linha
+ void linha_set_x2(Linha l, float x2);
+
+//define o valor de y2 para a linha
+ void linha_set_y2(Linha l, float y2);
+
+//define a cor da linha
+ void linha_set_cor(Linha l, char* cor);
 
 #endif

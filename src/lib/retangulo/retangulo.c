@@ -92,10 +92,40 @@ const char* retangulo_get_corb(const Retangulo r_g){
     return r->corb;
 }
 
-double getArear(const Retangulo r_g){
+double retangulo_get_area(const Retangulo r_g){
     const retangulo* r = (const retangulo*)r_g; 
     if(r == NULL)return 0.0;
     return r->area;
+}
+
+void retangulo_set_x(Retangulo r_g, float x){
+    retangulo* r = (retangulo*)r_g;
+    if(r != NULL){
+        r->x = x;
+    }
+}
+
+void retangulo_set_y(Retangulo r_g, float y){
+    retangulo* r = (retangulo*)r_g;
+    if(r != NULL){
+        r->y = y;
+    }
+}
+
+void retangulo_set_corp(Retangulo r_g, char* corp){
+    retangulo* r = (retangulo*)r_g;
+    if(r != NULL){
+        strncpy(r->corp, corp, sizeof(r->corp) - 1);
+        r->corp[sizeof(r->corp) - 1] = '\0';
+    }
+}
+
+void retangulo_set_corb(Retangulo r_g, char* corb){
+    retangulo* r = (retangulo*)r_g;
+    if(r != NULL){
+        strncpy(r->corb, corb, sizeof(r->corb) - 1);
+        r->corb[sizeof(r->corb) - 1] = '\0';
+    }
 }
 
 
