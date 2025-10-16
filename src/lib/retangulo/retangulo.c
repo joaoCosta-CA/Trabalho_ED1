@@ -98,6 +98,8 @@ double retangulo_get_area(const Retangulo r_g){
     return r->area;
 }
 
+/*----------IMPLEMENTAÇÃO SETTERS--------------*/
+
 void retangulo_set_x(Retangulo r_g, float x){
     retangulo* r = (retangulo*)r_g;
     if(r != NULL){

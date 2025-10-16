@@ -48,7 +48,7 @@ float area_texto(const Texto t) {
     return 20.0f * (float)strlen(texto_interno->conteudo);
 }
 
-void liberar_texto(Texto t) {
+void destruirTexto(Texto t) {
     free(t);
 }
 
@@ -64,13 +64,13 @@ float texto_get_x(const Texto t) {
     return texto->x;
 }
 
-float tedxto_get_y(const Texto t) {
+float texto_get_y(const Texto t) {
     if (!t) return 0.0f;
     struct TextoStruct* texto = (struct TextoStruct*)t;
     return texto->y;
 }
 
-char texto_get_ancora(Texto t) {
+char texto_get_ancora(const Texto t) {
     if (!t) return '\0';
     
     struct TextoStruct* texto = (struct TextoStruct*)t;
@@ -84,6 +84,19 @@ const char* texto_get_corb(const Texto t) {
     return texto->corb;
 }
 
+const char* texto_get_corp(const Texto t) {
+    if (!t) return NULL;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    return texto->corp;
+}
+
+const char* texto_get_conteudo(const Texto t) {
+    if (!t) return NULL;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    return texto->conteudo;
+}
+
+/*--------------IMPLEMENTAÇÃO SETTERS------------------*/
 void texto_set_corb(Texto t, const char* corb){
     if (!t || !corb) return;
     struct TextoStruct* texto = (struct TextoStruct*)t;

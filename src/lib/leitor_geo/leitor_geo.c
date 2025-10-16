@@ -8,6 +8,7 @@
 #include "../formas/formas.h"
 #include "../texto/texto.h"
 #include "../texto/estilo_texto.h"
+#include "../formas/formas.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -21,10 +22,10 @@ typedef struct {
 } ProcessadorDeFormas;
 
 // Estrutura genérica para encapsular qualquer tipo de forma.
-typedef struct {
-    ShapeType tipo;
-    void *dados_da_forma;
-} FormaGeometrica;
+// typedef struct {
+//     ShapeType tipo;
+//     void *dados_da_forma;
+// } FormaGeometrica;
 
 
 // Função auxiliar para registrar uma nova forma nas coleções
@@ -218,21 +219,23 @@ static void escrever_svg_de_saida(ProcessadorDeFormas *processador, const char *
         switch (forma->tipo) {
         case CIRCULO: {
             Circulo c = (Circulo)forma->dados_da_forma;
-            fprintf(arquivo_svg, "\t<circle cx='%.2fl' cy='%.2fl' r='%.2f' fill='%s' stroke='%s'/>\n",
+                printf("DEBUG SVG CIRCULO: id=%d, cx=%.2f, cy=%.2f\n", 
+           circulo_get_id(c), circulo_get_x(c), circulo_get_y(c));
+            fprintf(arquivo_svg, "\t<circle cx='%.2f' cy='%.2f' r='%.2f' fill='%s' stroke='%s'/>\n",
                     circulo_get_x(c), circulo_get_y(c), circulo_get_raio(c),
                     circulo_get_corp(c), circulo_get_corb(c));
             break;
         }
         case RETANGULO: {
             Retangulo r = (Retangulo)forma->dados_da_forma;
-            fprintf(arquivo_svg, "\t<rect x='%.2fl' y='%.2fl' width='%.2f' height='%.2f' fill='%s' stroke='%s'/>\n",
+            fprintf(arquivo_svg, "\t<rect x='%.2f' y='%.2f' width='%.2f' height='%.2f' fill='%s' stroke='%s'/>\n",
                     retangulo_get_x(r), retangulo_get_y(r), retangulo_get_larg(r),
                     retangulo_get_altura(r), retangulo_get_corp(r), retangulo_get_corb(r));
             break;
         }
         case LINHA: {
             Linha l = (Linha)forma->dados_da_forma;
-            fprintf(arquivo_svg, "\t<line x1='%.2fl' y1='%.2fl' x2='%.2fl' y2='%.2fl' stroke='%s'/>\n",
+            fprintf(arquivo_svg, "\t<line x1='%.2f' y1='%.2f' x2='%.2f' y2='%.2f' stroke='%s'/>\n",
                     linha_get_x1(l), linha_get_y1(l), linha_get_x2(l),
                     linha_get_y2(l), linha_get_cor(l));
             break;
@@ -243,7 +246,7 @@ static void escrever_svg_de_saida(ProcessadorDeFormas *processador, const char *
             const char *ancora_svg = "start"; // Padrão 'i' (início)
             if (caractere_ancora == 'm') {
                 ancora_svg = "middle";
-            } else if (caractere_ancora == 'f') { // BUG CORRIGIDO: de 'e' para 'f'
+            } else if (caractere_ancora == 'f') {
                 ancora_svg = "end";
             }
             fprintf(arquivo_svg, "\t<text x='%.2f' y='%.2f' fill='%s' stroke='%s' text-anchor='%s'>%s</text>\n",

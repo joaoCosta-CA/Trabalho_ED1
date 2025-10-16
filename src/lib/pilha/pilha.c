@@ -32,7 +32,7 @@ void push(PILHA pilha_g, void* valor){
     if(!novo)return;
 
     novo->valor = valor;
-    novo->prox = pilha->topo->prox;
+    novo->prox = pilha->topo;
     pilha->topo = novo;
     pilha->tamanho++;
 }
