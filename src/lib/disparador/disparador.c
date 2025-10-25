@@ -1,118 +1,97 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "disparador.h"
-#include "lib/pilha/pilha.h"
-#include "lib/fila/fila.h"
-#include "lib/formas/formas.h"
-#include "lib/circulo/circulo.h"
-#include "lib/retangulo/retangulo.h"
-#include "lib/linha/linha.h"
-#include "lib/texto/texto.h"
+#include "../leitor_geo/leitor_geo.h"
+#include "../linha/linha.h"
+#include "../circulo/circulo.h"
+#include "../retangulo/retangulo.h"
+#include "../texto/texto.h"
+#include "../carregadores/carregador.h"
+#include "../leitor_geo/leitor_geo.h"
 
-
+// A struct interna agora armazena ponteiros para Carregador, não para PILHA
 typedef struct {
     int id;
     double x;
     double y;
-
-    PILHA carga_esq;
-    PILHA carga_dir;
+    Carregador carga_esq;
+    Carregador carga_dir;
     FormaGeometrica* em_disparo;
 } DisparadorStruct;
-
 
 // --- FUNÇÕES DE CICLO DE VIDA ---
 
 Disp criar_disparador(int id, double x, double y) {
-    DisparadorStruct *d = (DisparadorStruct *)malloc(sizeof(DisparadorStruct));
-    if (d == NULL) {
-        perror("Erro ao alocar memória para o disparador");
-        return NULL;
-    }
+    DisparadorStruct *d = malloc(sizeof(DisparadorStruct));
+    if (d == NULL) return NULL;
 
     d->id = id;
     d->x = x;
     d->y = y;
-    d->carga_esq = criarPilha();
-    d->carga_dir = criarPilha();
+    d->carga_esq = NULL;
+    d->carga_dir = NULL;
     d->em_disparo = NULL;
-
-    if (d->carga_esq == NULL || d->carga_dir == NULL) {
-        destruirPilha(d->carga_esq);
-        destruirPilha(d->carga_dir);
-        free(d);
-        return NULL;
-    }
 
     return (Disp)d;
 }
 
 void destruir_disparador(Disp disp) {
-    DisparadorStruct *d = (DisparadorStruct *)disp;
-    if (d == NULL) return;
-
-    // As pilhas (carregadores) são destruídas.
-    destruirPilha(d->carga_esq);
-    destruirPilha(d->carga_dir);
-    free(d);
+    if (disp != NULL) {
+        free(disp);
+    }
 }
-
 
 // --- FUNÇÕES DE CONFIGURAÇÃO ---
 
 void posicionar_disparador(Disp disp, double x, double y) {
     DisparadorStruct *d = (DisparadorStruct *)disp;
-    if (d == NULL) return;
     d->x = x;
     d->y = y;
 }
 
-void anexar_carregadores(Disp disp, PILHA carregador_esq, PILHA carregador_dir) {
+void anexar_carregadores(Disp disp, Carregador carregador_esq, Carregador carregador_dir) {
     DisparadorStruct *d = (DisparadorStruct *)disp;
     if (d == NULL) return;
 
-    // Libera as pilhas vazias que foram criadas com o disparador
-    destruirPilha(d->carga_esq);
-    destruirPilha(d->carga_dir);
-
-    // Anexa as novas pilhas (carregadores)
     d->carga_esq = carregador_esq;
-    d->carga_dir = carregador_dir;
-}
 
+    d->carga_dir = carregador_dir;
+
+}
 
 // --- FUNÇÕES DE AÇÃO ---
 
+// Em disparador.c
 void shift_carga(Disp disp, char lado, int n) {
     DisparadorStruct *d = (DisparadorStruct *)disp;
     if (d == NULL) return;
 
     for (int i = 0; i < n; i++) {
-        FormaGeometrica* nova_forma = NULL;
+        FormaGeometrica nova_forma = NULL;
 
-        if (lado == 'd') {
-            if (pilha_vazia(d->carga_dir)) break; // Carga direita vazia, para o laço.
-            
-            nova_forma = (FormaGeometrica *)pop(d->carga_dir);
-            
-            if (d->em_disparo != NULL) {
-                push(d->carga_esq, d->em_disparo);
+        if (lado == 'd' && d->carga_dir != NULL) {
+            // AGORA d->carga_dir é o ponteiro Carregador correto
+            nova_forma = carregador_retira_forma(d->carga_dir); 
+            if (nova_forma == NULL) break;
+
+            if (d->em_disparo != NULL && d->carga_esq != NULL) {
+                carregador_municia_forma(d->carga_esq, d->em_disparo);
             }
 
-        } else if (lado == 'e') {
-            if (pilha_vazia(d->carga_esq)) break; // Carga esquerda vazia, para o laço.
-            
-            nova_forma = (FormaGeometrica *)pop(d->carga_esq);
+        } else if (lado == 'e' && d->carga_esq != NULL) {
+             // AGORA d->carga_esq é o ponteiro Carregador correto
+            nova_forma = carregador_retira_forma(d->carga_esq); 
+            if (nova_forma == NULL) break;
 
-            if (d->em_disparo != NULL) {
-                push(d->carga_dir, d->em_disparo);
+            if (d->em_disparo != NULL && d->carga_dir != NULL) {
+                carregador_municia_forma(d->carga_dir, d->em_disparo);
             }
         } else {
-            // Lado inválido, interrompe a operação.
             break;
         }
-        
+
         d->em_disparo = nova_forma;
     }
 }
@@ -123,18 +102,17 @@ void disparar_forma(Disp disp, double dx, double dy, FILA arena) {
         return; // Nada para disparar
     }
 
-    FormaGeometrica* forma_disparada = d->em_disparo;
-    void* dados_forma = forma_disparada->dados_da_forma;
-    
-    // Calcula a posição final da âncora
+    FormaGeometrica forma_disparada = d->em_disparo;
+
+    void* dados_forma = forma_get_dados(forma_disparada);
+
     double pos_final_x = d->x + dx;
     double pos_final_y = d->y + dy;
 
-    // Atualiza as coordenadas da forma de acordo com seu tipo
-    switch (forma_disparada->tipo) {
+    switch (forma_get_tipo(forma_disparada)) {
         case CIRCULO:
             circulo_set_x(dados_forma, pos_final_x);
-            circulo_set_y(dados_forma, pos_final_y);
+            circulo_set_y(dados_forma, pos_final_y); 
             break;
         case RETANGULO:
             retangulo_set_x(dados_forma, pos_final_x);
@@ -149,11 +127,8 @@ void disparar_forma(Disp disp, double dx, double dy, FILA arena) {
             double y1_orig = linha_get_y1(dados_forma);
             double x2_orig = linha_get_x2(dados_forma);
             double y2_orig = linha_get_y2(dados_forma);
-
-            // Translada a linha inteira mantendo sua orientação e tamanho
             double desloc_x = pos_final_x - x1_orig;
             double desloc_y = pos_final_y - y1_orig;
-
             linha_set_x1(dados_forma, x1_orig + desloc_x);
             linha_set_y1(dados_forma, y1_orig + desloc_y);
             linha_set_x2(dados_forma, x2_orig + desloc_x);
@@ -165,45 +140,37 @@ void disparar_forma(Disp disp, double dx, double dy, FILA arena) {
     }
 
     insertFila(arena, forma_disparada);
-    d->em_disparo = NULL; // Limpa a posição de disparo
+    d->em_disparo = NULL;
 }
 
-void rajada_de_disparos(Disp disp, char lado, double dx, double dy, double ix, double iy, FILA arena) {
+
+int rajada_de_disparos(Disp disp, char lado, double dx, double dy, double ix, double iy, FILA arena) {
     DisparadorStruct *d = (DisparadorStruct *)disp;
-    if (d == NULL) return;
+    if (d == NULL) return 0;
 
-    PILHA carga_alvo = (lado == 'd') ? d->carga_dir : d->carga_esq;
+    Carregador carga_alvo = (lado == 'd') ? d->carga_dir : d->carga_esq;
+    if (carga_alvo == NULL) return 0;
 
-    // Continua enquanto houver formas no carregador
-    while (!pilha_vazia(carga_alvo)) {
+    int disparos_executados = 0;
+    while (!carregador_esta_vazio(carga_alvo)) {
         shift_carga(disp, lado, 1);
-        
         disparar_forma(disp, dx, dy, arena);
-
         dx += ix;
         dy += iy;
+        disparos_executados++;
     }
+
+    return disparos_executados;
 }
-
-
-// --- FUNÇÕES DE ACESSO (GETTERS) ---
-
 int disparador_get_id(Disp disp) {
-    DisparadorStruct *d = (DisparadorStruct *)disp;
-    return (d != NULL) ? d->id : -1;
+    return ((DisparadorStruct*)disp)->id;
 }
-
 double disparador_get_x(Disp disp) {
-    DisparadorStruct *d = (DisparadorStruct *)disp;
-    return (d != NULL) ? d->x : 0.0;
+    return ((DisparadorStruct*)disp)->x;
 }
-
 double disparador_get_y(Disp disp) {
-    DisparadorStruct *d = (DisparadorStruct *)disp;
-    return (d != NULL) ? d->y : 0.0;
+    return ((DisparadorStruct*)disp)->y;
 }
-
 FormaGeometrica* disparador_get_em_disparo(Disp disp) {
-    DisparadorStruct *d = (DisparadorStruct *)disp;
-    return (d != NULL) ? d->em_disparo : NULL;
+    return ((DisparadorStruct*)disp)->em_disparo;
 }

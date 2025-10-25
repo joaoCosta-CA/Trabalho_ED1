@@ -10,11 +10,18 @@ struct TextoStruct {
     int id;
     float x;
     float y;
+    double area;
     char corb[TAMANHO_COR];
     char corp[TAMANHO_COR];
     char ancora;
     char conteudo[TAMANHO_CONTEUDO];
 };
+
+static double texto_calc_area(const Texto t){
+    if(!t)return 0.0;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    return 20.0 * (double)strlen(texto->conteudo);
+}
 
 // A assinatura da função agora corresponde exatamente à do arquivo .h
 Texto criar_texto(int id, float x, float y, const char* corb, const char* corp, char ancora, const char* conteudo) {
@@ -49,7 +56,11 @@ float area_texto(const Texto t) {
 }
 
 void destruirTexto(Texto t) {
-    free(t);
+    Texto* texto = (Texto*)t;
+    if(t != NULL){
+        //free(t);
+    }
+
 }
 
 int texto_get_id(const Texto t) {
@@ -68,6 +79,12 @@ float texto_get_y(const Texto t) {
     if (!t) return 0.0f;
     struct TextoStruct* texto = (struct TextoStruct*)t;
     return texto->y;
+}
+
+double texto_get_area(const Texto t) {
+    if (!t) return 0.0;
+    struct TextoStruct* texto = (struct TextoStruct*)t;
+    return texto->area;
 }
 
 char texto_get_ancora(const Texto t) {

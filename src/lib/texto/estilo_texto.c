@@ -56,13 +56,13 @@ void estilo_texto_destruir(EstiloTexto estilo) {
     }
 
     // Converte o ponteiro genérico de volta para o tipo da estrutura interna.
-    EstiloTextoInfo *estilo_a_liberar = (EstiloTextoInfo *)estilo;
+    EstiloTextoInfo *estilo_info = (EstiloTextoInfo *)estilo;
 
-    // Libera primeiro a memória alocada para a string interna.
-    free(estilo_a_liberar->familia_da_fonte);
-
-    // Libera a memória da própria estrutura.
-    free(estilo_a_liberar);
+    if (estilo_info->familia_da_fonte != NULL) {
+        free(estilo_info->familia_da_fonte);
+        estilo_info->familia_da_fonte = NULL; // Boa prática
+    }
+    
 }
 
 const char *estilo_texto_obter_familia(EstiloTexto estilo) {

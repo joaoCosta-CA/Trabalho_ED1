@@ -42,6 +42,7 @@ void destruirTexto(Texto t);
 int texto_get_id(const Texto t);
 float texto_get_x(const Texto t);
 float texto_get_y(const Texto t);
+double texto_get_area(const Texto t);
 char texto_get_ancora(const Texto t);
 const char *texto_get_corb(const Texto t);
 const char *texto_get_corp(const Texto t);

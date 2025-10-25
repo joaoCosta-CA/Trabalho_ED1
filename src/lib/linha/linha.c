@@ -20,7 +20,6 @@ static double CalcArea(const linha* l){
     double dy = l->y2 - l->y1;
     double comprimento = sqrt(pow(dx, 2) + pow(dy, 2));
 
-    // A área é 2.0 * comprimento, conforme o PDF 
     return 2.0 * comprimento;
 }
 
@@ -45,7 +44,7 @@ Linha criarLinha(int id, float x1, float y1, float x2, float y2, char* cor){
 void destruirLinha(Linha l_g){
     linha* l = (linha*)l_g;
     if(l != NULL){
-        free(l);
+        //free(l);
     }
 }
 

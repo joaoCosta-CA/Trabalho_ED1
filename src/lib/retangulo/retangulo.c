@@ -45,7 +45,7 @@ Retangulo criarRec(int id, float x, float y, double w, double h, char* corp, cha
 void destruirRec(Retangulo r_g){
     retangulo* r = (retangulo*)r_g;
     if(r != NULL){
-        free(r);
+        // free(r);
     }
 }
 

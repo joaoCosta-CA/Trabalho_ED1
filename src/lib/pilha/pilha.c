@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pilha.h"
+#define PILHA_GERENCIAMENTO_ADDR ( (void*)0x5555555655e0 )
 
 typedef struct Nod {
     void* valor;
@@ -35,16 +36,17 @@ void push(PILHA pilha_g, void* valor){
     novo->prox = pilha->topo;
     pilha->topo = novo;
     pilha->tamanho++;
+
 }
 
 int pilha_vazia(const PILHA pilha_g){
-    Pilha* pilha = (Pilha*) pilha_g;
+    Pilha* pilha = (Pilha*)pilha_g;
     if(!pilha)return 1;
 
     return pilha->tamanho == 0;
 }
 
-PILHA pop(PILHA pilha_g){
+void* pop(PILHA pilha_g){
     Pilha* pilha = (Pilha*) pilha_g;
     if(!pilha || pilha_vazia(pilha))return NULL;
 
@@ -71,4 +73,21 @@ void destruirPilha(PILHA pilha_g){
     while(pilha->tamanho > 0){
         pop(pilha);
     }
+}
+
+void* pilha_get_topo_debug(PILHA pilha_g) {
+    Pilha* pilha = (Pilha*)pilha_g;
+    if (!pilha) {
+        return NULL;
+    }
+    // Retorna o ponteiro Node como void*
+    return (void*)pilha->topo; 
+}
+
+int pilha_get_tamanho(PILHA pilha_g) {
+    Pilha* pilha = (Pilha*)pilha_g;
+    if (!pilha) {
+        return -1; // Ou 0, dependendo da sua convenção de erro
+    }
+    return pilha->tamanho;
 }

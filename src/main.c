@@ -1,23 +1,21 @@
 #include "lib/argumentos/argumentos.h"
 #include "lib/ler_arq/leitor.h"
 #include "lib/leitor_geo/leitor_geo.h"
+#include "lib/leitor_qry/leitor_qry.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char *argv[]) {
 
-    // Uma verificação do número mínimo de argumentos
-    // Precisa de pelo menos 5: ./ted -f arquivo.geo -o caminho
     if (argc < 5) {
-        printf("Uso: ./ted -f <arq.geo> -o <dir_saida> [-q <arq.qry>]\n");
+        printf("Uso: ./ted [-e <dir_base>] -f <arq.geo>  [-q <arq.qry>]  -o ./output\n");
         return 1;
     }
 
-    // --- Processamento dos Argumentos ---
     const char *output_path = get_option_value(argc, argv, "o");
     const char *geo_input_path = get_option_value(argc, argv, "f");
-    // const char *qry_input_path = get_option_value(argc, argv, "q"); // Para ser usado depois
-    const char *command_suffix = get_command_suffix(argc, argv);
+    const char *qry_input_path = get_option_value(argc, argv, "q");
+    const char *command_suffix = get_command_suffix(argc, argv); 
 
     if (geo_input_path == NULL || output_path == NULL) {
         printf("Erro: Os parâmetros -f e -o são obrigatórios.\n");
@@ -31,9 +29,22 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
     
-    Chao ground = processar_arquivo_geo(geo_file, output_path, command_suffix);
+    Chao ground = processar_arquivo_geo(geo_file, output_path, NULL);
 
-    // --- Limpeza de Memória ---
+    if (qry_input_path != NULL) {
+        DadosArquivo qry_file = dados_arquivo_criar(qry_input_path);
+        if (qry_file == NULL) {
+            printf("Erro: Falha ao abrir ou ler o arquivo de consulta '%s'\n", qry_input_path);
+            // Limpa a memória alocada antes de sair
+            destruir_formas_geo(ground);
+            dados_arquivo_destruir(geo_file);
+            exit(EXIT_FAILURE);
+        }
+
+        processar_arquivo_qry(ground, qry_file, geo_file, output_path);
+
+        dados_arquivo_destruir(qry_file);
+    }
     dados_arquivo_destruir(geo_file);
     destruir_formas_geo(ground);
 

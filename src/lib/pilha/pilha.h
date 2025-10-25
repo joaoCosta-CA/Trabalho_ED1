@@ -16,7 +16,7 @@ void push(PILHA pilha, void *valor);
  * @param 'valor' alguma forma geométrica que irá ser inserida dentro da pilha
  */
 
-PILHA pop(PILHA pilha);
+void* pop(PILHA pilha);
 /**
  * @brief remove o último elemento inserido na pilha
  * @param 'pilha' será a própria pilha que terá o valor removido e a memória liberada
@@ -43,4 +43,19 @@ int pilha_tamanho(const PILHA pilha);
   * @param 'pilha' será a pilha que terá toda a memória liberada
   */
 
+
+  /**
+ * @brief [APENAS PARA DEPURAÇÃO AVANÇADA] Retorna o ponteiro bruto para o nó do topo.
+ * ATENÇÃO: Usar isso fora da depuração quebra o encapsulamento.
+ * @param pilha_g O ponteiro opaco para a pilha.
+ * @return Um ponteiro void* para o nó do topo (ou NULL se vazia/inválida).
+ */
+void* pilha_get_topo_debug(PILHA pilha_g);
+
+/**
+ * @brief Retorna o número de elementos na pilha.
+ * @param pilha_g O ponteiro opaco para a pilha.
+ * @return O número de elementos, ou -1 se a pilha for NULL.
+ */
+int pilha_get_tamanho(PILHA pilha_g);
 #endif

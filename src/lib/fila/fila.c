@@ -27,7 +27,6 @@ FILA criarFila(){
     fila->inicio = NULL;
     fila->fim = NULL;
     fila->tamanho = 0;
-
     return fila;
 }
 
@@ -75,7 +74,9 @@ void* removeFila(FILA fila_g){
 
 void destruirFila(FILA fila_g) {
     Fila* fila = (Fila*)fila_g;
-    if (fila == NULL) return;
+    if (fila == NULL) {
+        return;
+    }
 
     Node atual = fila->inicio;
     while (atual != NULL) {
@@ -83,7 +84,7 @@ void destruirFila(FILA fila_g) {
         free(atual);
         atual = proximo;
     }
-    free(fila);
+    free(fila); 
 }
 
 int fila_vazia(const FILA fila_g) {
@@ -92,7 +93,7 @@ int fila_vazia(const FILA fila_g) {
     return fila->tamanho == 0;
 }
 
-int fila_tamanho(const FILA fila_g) {
+int filaTamanho(const FILA fila_g) {
     const Fila* fila = (const Fila*)fila_g;
     if (fila == NULL) return 0;
     return fila->tamanho;
