@@ -18,8 +18,7 @@
 // Estrutura para gerenciar todas as formas geométricas e coleções.
 typedef struct {
     FILA fila_de_todas_as_formas; // Fila principal com todas as formas na ordem de criação.
-    PILHA pilha_gerenciamento_memoria; // Pilha usada para facilitar a desalocação de memória.
-    FILA fila_renderizacao_svg;  
+    PILHA pilha_gerenciamento_memoria; // Pilha usada para facilitar a desalocação de memória. 
     int max_id;
 } ProcessadorDeFormas;
 
@@ -54,7 +53,6 @@ Chao processar_arquivo_geo(DadosArquivo dados_arquivo, const char *caminho_saida
 
     processador->fila_de_todas_as_formas = criarFila();
     processador->pilha_gerenciamento_memoria = criarPilha();
-    processador->fila_renderizacao_svg = criarFila();
 
     FILA linhas_de_comando = obter_fila_linhas(dados_arquivo);
 
@@ -97,7 +95,6 @@ void destruir_formas_geo(Chao chao) {
     if (!processador) return;
 
     destruirFila(processador->fila_de_todas_as_formas);
-    destruirFila(processador->fila_renderizacao_svg);
 
     while (!pilha_vazia(processador->pilha_gerenciamento_memoria)) {
         FormaGeometrica forma_ptr = pop(processador->pilha_gerenciamento_memoria); 
@@ -152,7 +149,6 @@ static void registrar_nova_forma(ProcessadorDeFormas *processador, ShapeType tip
 
     insertFila(processador->fila_de_todas_as_formas, (FormaGeometrica)capsula_da_forma);
     push(processador->pilha_gerenciamento_memoria, (FormaGeometrica)capsula_da_forma);
-    insertFila(processador->fila_renderizacao_svg, (FormaGeometrica)capsula_da_forma);
 }
 
 static void tratar_comando_circulo(ProcessadorDeFormas *processador) {
@@ -417,31 +413,22 @@ static void tratar_comando_texto(ProcessadorDeFormas *processador) {
         return;
     }
 
-    char* inicio_conteudo = token + 1;
-    if (*inicio_conteudo == ' ' || *inicio_conteudo == '\t') {
-         inicio_conteudo++;
+    conteudo_texto = strtok(NULL, "\r\n");
 
-         int len = strlen(inicio_conteudo);
-         while (len > 0 && (inicio_conteudo[len-1] == ' ' || inicio_conteudo[len-1] == '\t' || inicio_conteudo[len-1] == '\r' || inicio_conteudo[len-1] == '\n')) {
-             inicio_conteudo[--len] = '\0';
-         }
-         conteudo_texto = inicio_conteudo;
-    } else if (*inicio_conteudo == '\0' || *inicio_conteudo == '\n' || *inicio_conteudo == '\r') { 
+    if (conteudo_texto == NULL) {
          fprintf(stderr, "Erro de formato: Faltando conteúdo do texto para o texto ID %d.\n", id); 
          return;
-    } else {
-         fprintf(stderr, "Erro de formato: Esperado espaço após a âncora para o texto ID %d.\n", id); 
-         return;
     }
-    
-    // Verifica se, após a limpeza, o conteúdo não ficou vazio
-    if (conteudo_texto == NULL || *conteudo_texto == '\0') {
+
+    while (*conteudo_texto == ' ' || *conteudo_texto == '\t') {
+        conteudo_texto++;
+    }
+
+    if (*conteudo_texto == '\0') {
          fprintf(stderr, "Erro de formato: Conteúdo do texto vazio para o texto ID %d.\n", id); 
          return;
     }
 
-
-    // Cria o texto apenas se todos os parâmetros foram lidos
     Texto t = criar_texto(id, x, y, cor_borda, cor_preenchimento, ancora_char, conteudo_texto);
     if (t) {
         registrar_nova_forma(processador, TEXTO, t);
@@ -512,13 +499,16 @@ FILE* svg_iniciar(const char* caminho_completo) {
 
 void svg_desenhar_chao(FILE* arquivo_svg, Chao chao) {
     if (!arquivo_svg || !chao) return;
-    
     ProcessadorDeFormas* processador = (ProcessadorDeFormas*)chao;
 
-    IteradorFila it = fila_obter_iterador(processador->fila_renderizacao_svg);
+    IteradorFila it = fila_obter_iterador(processador->fila_de_todas_as_formas); 
+
     while (iterador_tem_proximo(it)) {
         FormaGeometricaStruct *forma = (FormaGeometricaStruct *)iterador_obter_proximo(it);
-        desenhar_forma_svg(arquivo_svg, forma);
+        // Desenha apenas tipos visuais
+        if (forma->tipo == CIRCULO || forma->tipo == RETANGULO || forma->tipo == LINHA || forma->tipo == TEXTO) {
+            desenhar_forma_svg(arquivo_svg, forma);
+        }
     }
 }
 
@@ -702,6 +692,7 @@ FormaGeometrica forma_clonar(FormaGeometrica forma_original, int* proximo_id) {
              case RETANGULO: destruirRec(dados_clonados); break;
              case LINHA: destruirLinha(dados_clonados); break;
              case TEXTO: destruirTexto(dados_clonados); break;
+             case ESTILO_TEXTO: printf("Tipo de objeto inválido"); break;
         }
         (*proximo_id)--;
         return NULL;
@@ -710,22 +701,4 @@ FormaGeometrica forma_clonar(FormaGeometrica forma_original, int* proximo_id) {
     capsula_clone->dados_da_forma = dados_clonados;
 
     return (FormaGeometrica)capsula_clone;
-}
-
-FILA leitor_geo_get_fila_renderizacao(Chao chao) {
-    ProcessadorDeFormas *proc = (ProcessadorDeFormas *)chao;
-    if (!proc) {
-        return NULL;
-    }
-    return proc->fila_renderizacao_svg;
-}
-
-void leitor_geo_limpar_fila_renderizacao(Chao chao) {
-    ProcessadorDeFormas *proc = (ProcessadorDeFormas *)chao;
-    if (!proc || !proc->fila_renderizacao_svg) {
-        return;
-    }
-    while (!fila_vazia(proc->fila_renderizacao_svg)) {
-        removeFila(proc->fila_renderizacao_svg);
-    }
 }

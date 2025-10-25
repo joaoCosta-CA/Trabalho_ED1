@@ -101,19 +101,4 @@ FormaGeometrica forma_clonar(FormaGeometrica forma_original, int* proximo_id);
 // Função para obter o maior ID usado no arquivo .geo
 int leitor_geo_get_max_id(Chao chao);
 
-/**
- * @brief Obtém um ponteiro para a fila usada para renderização SVG.
- * Permite que outros módulos adicionem ou manipulem esta fila.
- * @param chao O ponteiro opaco para o estado do leitor_geo.
- * @return A FILA usada para renderização.
- */
-FILA leitor_geo_get_fila_renderizacao(Chao chao);
-
-/**
- * @brief Remove todos os elementos da fila de renderização SVG.
- * Útil para limpar o estado antes de redesenhar após comandos QRY.
- * @param chao O ponteiro opaco para o estado do leitor_geo.
- */
-void leitor_geo_limpar_fila_renderizacao(Chao chao);
-
 #endif

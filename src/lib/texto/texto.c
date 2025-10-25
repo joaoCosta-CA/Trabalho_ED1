@@ -36,6 +36,7 @@ Texto criar_texto(int id, float x, float y, const char* corb, const char* corp, 
     novo_texto->id = id;
     novo_texto->x = x;
     novo_texto->y = y;
+    novo_texto->area = texto_calc_area((Texto)novo_texto);
     novo_texto->ancora = ancora;
 
     snprintf(novo_texto->corb, TAMANHO_COR, "%s", corb ? corb : "");
@@ -56,9 +57,9 @@ float area_texto(const Texto t) {
 }
 
 void destruirTexto(Texto t) {
-    Texto* texto = (Texto*)t;
-    if(t != NULL){
-        //free(t);
+    Texto* texto = (Texto*)t;               
+    if(texto != NULL){
+        //free(texto);
     }
 
 }

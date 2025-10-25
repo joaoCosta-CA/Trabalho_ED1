@@ -7,7 +7,7 @@ typedef void* Retangulo;
     arquivo destina para a organização de todas as funções e modificações para a forma retangulo
 */
 
-Retangulo criarRec(int id, float x, float y, double w, double h, char* corp, char* corb);
+Retangulo criarRec(int id, float x, float y, double w, double h, const char* corp, const char* corb);
 /**
  * @brief cria um retangulo de área WxH 
  * @param id, um valor int que identifica o retangulo criado
@@ -58,9 +58,9 @@ void retangulo_set_x(Retangulo r, float x);
 void retangulo_set_y(Retangulo r, float y);
 
 // Define a cor de preenchimento do retângulo
-void retangulo_set_corp(Retangulo r, char* corp);
+void retangulo_set_corp(Retangulo r, const char* corp);
 
 // Define a cor da borda do retângulo
-void retangulo_set_corb(Retangulo r, char* corb);
+void retangulo_set_corb(Retangulo r, const char* corb);
 
 #endif

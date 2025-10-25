@@ -97,7 +97,7 @@ void circulo_set_y(Circulo c_g, float y){
     }
 }
 
-void circulo_set_corp(Circulo c_g, char* corP){
+void circulo_set_corp(Circulo c_g, const char* corP){
     circulo* c = (circulo*)c_g;
     if(c != NULL && corP != NULL){
         strncpy(c->corp, corP, sizeof(c->corp) - 1);
@@ -105,7 +105,7 @@ void circulo_set_corp(Circulo c_g, char* corP){
     }
 }
 
-void circulo_set_corb(Circulo c_g, char* corB){
+void circulo_set_corb(Circulo c_g, const char* corB){
     circulo* c = (circulo*)c_g;
     if(c != NULL && corB != NULL){
         strncpy(c->corb, corB, sizeof(c->corb) - 1);

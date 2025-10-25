@@ -22,7 +22,7 @@ static double CalcArea(double w, double h){
     return w*h;
 }
 
-Retangulo criarRec(int id, float x, float y, double w, double h, char* corp, char* corb){
+Retangulo criarRec(int id, float x, float y, double w, double h, const char* corp, const char* corb){
     retangulo* r = (retangulo*)malloc(sizeof(retangulo));
     if(r == NULL){
         return NULL;
@@ -45,7 +45,7 @@ Retangulo criarRec(int id, float x, float y, double w, double h, char* corp, cha
 void destruirRec(Retangulo r_g){
     retangulo* r = (retangulo*)r_g;
     if(r != NULL){
-        // free(r);
+        //free(r);
     }
 }
 
@@ -114,7 +114,7 @@ void retangulo_set_y(Retangulo r_g, float y){
     }
 }
 
-void retangulo_set_corp(Retangulo r_g, char* corp){
+void retangulo_set_corp(Retangulo r_g, const char* corp){
     retangulo* r = (retangulo*)r_g;
     if(r != NULL){
         strncpy(r->corp, corp, sizeof(r->corp) - 1);
@@ -122,7 +122,7 @@ void retangulo_set_corp(Retangulo r_g, char* corp){
     }
 }
 
-void retangulo_set_corb(Retangulo r_g, char* corb){
+void retangulo_set_corb(Retangulo r_g, const char* corb){
     retangulo* r = (retangulo*)r_g;
     if(r != NULL){
         strncpy(r->corb, corb, sizeof(r->corb) - 1);

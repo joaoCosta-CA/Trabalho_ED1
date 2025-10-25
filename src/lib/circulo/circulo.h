@@ -7,7 +7,7 @@
 
 typedef void* Circulo;/*typedef de um ponteiro opaco para 'CIRCULO'*/
 
-Circulo CriarCirc(int id, float x, float y, double r,const char* corb,const char* corp);
+Circulo CriarCirc(int id, float x, float y, double r, const char* corb, const char* corp);
 /** 
  * @brief cria um circulo com os parametros fornecidos
  * @param id é um inteiro usado para identificar a forma criada
@@ -40,8 +40,8 @@ void DestruirCirc(Circulo c);
 
  void circulo_set_x(Circulo c, float x);
  void circulo_set_y(Circulo c, float y);
- void circulo_set_corp(Circulo c, char* corp);
- void circulo_set_corb(Circulo c, char* corb);
+ void circulo_set_corp(Circulo c, const char* corp);
+ void circulo_set_corb(Circulo c, const char* corb);
 
  /*--------------------------------*/
 

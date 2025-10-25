@@ -15,6 +15,8 @@
 #include "../texto/texto.h"
 #include "../linha/linha.h"
 
+#define MAX_PATH_LEN 1024;
+
 
 typedef struct {
     double x_inicio, y_inicio;
@@ -100,7 +102,7 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
     ponto = strrchr(nome_qry_sem_ext, '.');
     if (ponto) *ponto = '\0';
     
-    char caminho_log_txt[512];
+    char caminho_log_txt[1024];
     snprintf(caminho_log_txt, sizeof(caminho_log_txt), "%s/%s-%s.txt", caminho_saida, nome_geo_sem_ext, nome_qry_sem_ext);
     arquivo_log_txt = fopen(caminho_log_txt, "w");
     if (arquivo_log_txt == NULL) {
@@ -150,7 +152,7 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
     }
 
     // Geração do arquivo SVG final (ex: geo-qry.svg)
-    char caminho_final_svg[512];
+    char caminho_final_svg[1024];
     snprintf(caminho_final_svg, sizeof(caminho_final_svg), "%s/%s-%s.svg", caminho_saida, nome_geo_sem_ext, nome_qry_sem_ext);
     FILE* svg = svg_iniciar(caminho_final_svg);
     if (svg) {
@@ -168,6 +170,12 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
              fprintf(svg, "\t<text x='%.2f' y='%.2f' font-size='8' fill='purple' writing-mode='tb'>%.2f</text>\n",
                      anot.x_fim + 2, anot.y_inicio + (anot.dy / 2), anot.dy);
         }
+
+    for (int i = 0; i < num_anotacoes_esmag; i++) {
+        AnotacaoEsmagamento anot_esmag = array_anotacoes_esmag[i];
+        fprintf(svg, "\t<text x='%.2f' y='%.2f' fill='red' font-size='15' text-anchor='middle' dominant-baseline='middle'>*</text>\n",anot_esmag.x, anot_esmag.y);
+    }
+
         svg_finalizar(svg);
     }
 
@@ -284,8 +292,6 @@ static void tratar_comando_lc(char* params, Chao chao, Carregador** array_carreg
         return;
     }
     (*array_carregadores)[(*num_carregadores) - 1] = novo_carregador;
-    
-    PILHA ponteiro_da_pilha = carregador_get_pilha(novo_carregador);
 
     FILA fila_do_chao = leitor_geo_get_fila_principal(chao);
     for (int i = 0; i < n_formas && !fila_vazia(fila_do_chao); ++i) {
@@ -478,26 +484,34 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
 
     // Devolve as formas processadas (na ordem correta) para a fila principal do chão
     FILA fila_do_chao = leitor_geo_get_fila_principal(chao);
-    FILA fila_render = leitor_geo_get_fila_renderizacao(chao);
-
-    // Limpa a fila de renderização usando a função pública
-    leitor_geo_limpar_fila_renderizacao(chao);
 
     while (!fila_vazia(fila_retorno)) {
+        printf("DEBUG [calc - FIM]: Topo do loop de retorno.\n");
+        fflush(stdout);
+
         FormaGeometrica forma_a_retornar = removeFila(fila_retorno);
+
+        printf("DEBUG [calc - FIM]: Removido ponteiro %p (ID %d) da fila_retorno.\n",
+               (void*)forma_a_retornar, forma_get_id(forma_a_retornar));
+        fflush(stdout);
         if (!forma_a_retornar) { 
             fprintf(stderr, "ERRO: removeFila(fila_retorno) retornou NULL!\n"); 
             break; // Evita usar ponteiro NULL
         }
 
-        int id_forma = forma_get_id(forma_a_retornar); // Obtém ID para logs
+        printf("DEBUG [calc - FIM]: Inserindo ID %d na fila_do_chao (%p)...\n",
+               forma_get_id(forma_a_retornar), (void*)fila_do_chao);
+        fflush(stdout);
+
         insertFila(fila_do_chao, forma_a_retornar);
 
-        ShapeType tipo = forma_get_tipo(forma_a_retornar);
-        if (tipo == CIRCULO || tipo == RETANGULO || tipo == LINHA || tipo == TEXTO) {
-             insertFila(fila_render, forma_a_retornar);
-        }
+        printf("DEBUG [calc - FIM]: Inserido na fila_do_chao. OK.\n");
+        fflush(stdout);
+
     }
+    printf("DEBUG [calc - FIM]: Fim do loop while de retorno. Chamando destruirFila(fila_retorno)...\n");
+    fflush(stdout);
+
     destruirFila(fila_retorno);
 
     *pontuacao_total += area_esmagada_round;

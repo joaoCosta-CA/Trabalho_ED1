@@ -23,7 +23,7 @@ static double CalcArea(const linha* l){
     return 2.0 * comprimento;
 }
 
-Linha criarLinha(int id, float x1, float y1, float x2, float y2, char* cor){
+Linha criarLinha(int id, float x1, float y1, float x2, float y2, const char* cor){
     linha* l = (linha*)malloc(sizeof(linha));
     if(l == NULL){
         return NULL;
@@ -118,7 +118,7 @@ void linha_set_y2(Linha l_g, float y2){
 }
 
 
-void linha_set_cor(Linha l_g, char* cor){
+void linha_set_cor(Linha l_g, const char* cor){
     linha* l = (linha*)l_g;
     if(l != NULL){
         strncpy(l->cor, cor, sizeof(l->cor) - 1);

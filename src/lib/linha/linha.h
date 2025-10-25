@@ -8,7 +8,7 @@ typedef void* Linha;
     arquivo destina para a organização de todas as funções e modificações para a forma linha
 */
 
-Linha criarLinha(int id, float x1, float y1, float x2, float y2, char *cor);
+Linha criarLinha(int id, float x1, float y1, float x2, float y2, const char* cor);
 /**
  * @brief cria uma linha com os pontos (x1,y1) e (x2,y2)
  * @param id, um valor int que identifica a linha criada
@@ -65,6 +65,6 @@ const char* linha_get_cor(const Linha l);
  void linha_set_y2(Linha l, float y2);
 
 //define a cor da linha
- void linha_set_cor(Linha l, char* cor);
+ void linha_set_cor(Linha l, const char* cor);
 
 #endif
