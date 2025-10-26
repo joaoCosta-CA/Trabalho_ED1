@@ -22,7 +22,7 @@ static double CalcArea(double w, double h){
     return w*h;
 }
 
-Retangulo criarRec(int id, float x, float y, double w, double h, const char* corp, const char* corb){
+Retangulo criarRec(int id, float x, float y, double w, double h, const char* corb, const char* corp){
     retangulo* r = (retangulo*)malloc(sizeof(retangulo));
     if(r == NULL){
         return NULL;

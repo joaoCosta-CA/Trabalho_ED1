@@ -157,19 +157,6 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
     FILE* svg = svg_iniciar(caminho_final_svg);
     if (svg) {
         svg_desenhar_chao(svg, chao);
-            for (int i = 0; i < num_anotacoes_disparo; i++) {
-            AnotacaoDisparo anot = array_anotacoes_disparo[i];
-            fprintf(svg, "\t<line x1='%.2f' y1='%.2f' x2='%.2f' y2='%.2f' stroke='purple' stroke-width='1'/>\n",
-                    anot.x_inicio, anot.y_inicio, anot.x_fim, anot.y_fim);
-            fprintf(svg, "\t<line x1='%.2f' y1='%.2f' x2='%.2f' y2='%.2f' stroke='purple' stroke-width='0.5' stroke-dasharray='3,3'/>\n",
-                    anot.x_inicio, anot.y_inicio, anot.x_fim, anot.y_inicio);
-            fprintf(svg, "\t<text x='%.2f' y='%.2f' font-size='8' fill='purple'>%.2f</text>\n",
-                     anot.x_inicio + (anot.dx / 2), anot.y_inicio - 2, anot.dx);
-            fprintf(svg, "\t<line x1='%.2f' y1='%.2f' x2='%.2f' y2='%.2f' stroke='purple' stroke-width='0.5' stroke-dasharray='3,3'/>\n",
-                    anot.x_fim, anot.y_inicio, anot.x_fim, anot.y_fim);
-             fprintf(svg, "\t<text x='%.2f' y='%.2f' font-size='8' fill='purple' writing-mode='tb'>%.2f</text>\n",
-                     anot.x_fim + 2, anot.y_inicio + (anot.dy / 2), anot.dy);
-        }
 
     for (int i = 0; i < num_anotacoes_esmag; i++) {
         AnotacaoEsmagamento anot_esmag = array_anotacoes_esmag[i];

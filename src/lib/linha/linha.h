@@ -20,51 +20,138 @@ Linha criarLinha(int id, float x1, float y1, float x2, float y2, const char* cor
  * @param corb, é a cor que a borda da linha deverá ter
  */
 
- void destruirLinha(Linha l);
 /**
- * @brief libera a memória alocada para a linha
- * @param l, ponteiro para a linha a ser destruída
+ * @brief Libera os recursos associados a uma Linha.
+ *
+ * Esta função destrói a estrutura representada por 'l', liberando a memória
+ * e quaisquer recursos internos alocados para a Linha.
+ *
+ * @param l Handle/ponteiro para a Linha a ser destruída. Se 'l' for NULL,
+ *          a função não realiza nenhuma ação.
+ *
+ * @pre 'l' deve ter sido obtido previamente por uma função de criação ou
+ *      outra rotina que retorne um objeto Linha válido.
+ * @post Os recursos associados a 'l' foram liberados e o handle torna-se
+ *       inválido; não deve ser utilizado após a chamada.
+ *
  */
+ void destruirLinha(Linha l);
 
 
  /*--------------FUNCÇÕES GETTERS ----------------------*/
 
-// Retorna o id da linha
+/**
+ * @brief Retorna o identificador da linha.
+ *
+ * @param l Instância da Linha cujo identificador será obtido. Deve representar
+ *          uma linha válida.
+ * @return int Identificador (ID) associado à linha.
+ *
+ */
 int linha_get_id(const Linha l);
-
-// Retorna x1 do primeiro ponto
+ 
+/**
+ * @brief Obtém a coordenada X do primeiro ponto da linha.
+ *
+ * @param l Instância da Linha da qual se deseja a coordenada X1.
+ * @return float Valor da coordenada X do primeiro ponto.
+ *
+ */
 float linha_get_x1(const Linha l);
-
-// Retorna y1 do primeiro ponto
+ 
+/**
+ * @brief Obtém a coordenada Y do primeiro ponto da linha.
+ *
+ * @param l Instância da Linha da qual se deseja a coordenada Y1.
+ * @return float Valor da coordenada Y do primeiro ponto.
+ *
+ */
 float linha_get_y1(const Linha l);
-
-// Retorna x2 do segundo ponto
+ 
+/**
+ * @brief Obtém a coordenada X do segundo ponto da linha.
+ *
+ * @param l Instância da Linha da qual se deseja a coordenada X2.
+ * @return float Valor da coordenada X do segundo ponto.
+ *
+ */
 float linha_get_x2(const Linha l);
-
-// Retorna y2 do segundo ponto
+ 
+/**
+ * @brief Obtém a coordenada Y do segundo ponto da linha.
+ *
+ * @param l Instância da Linha da qual se deseja a coordenada Y2.
+ * @return float Valor da coordenada Y do segundo ponto.
+ *
+ */
 float linha_get_y2(const Linha l);
-
-// Retorna a área da linha (geralmente zero)
+ 
+/**
+ * @brief Calcula e retorna a "área" associada à linha.
+ *
+ * @param l Instância da Linha para a qual a área será calculada.
+ * @return double Valor da área associada à linha (conforme definição usada
+ *                pela aplicação; por exemplo pode ser 0 para uma linha pura
+ *                ou outra métrica definida pelo domínio).
+ *
+ */
 double linha_get_area(const Linha l);
-
-// Retorna a cor da linha
+ 
+/**
+ * @brief Retorna a cor associada à linha.
+ *
+ * @param l Instância da Linha da qual se obtém a cor.
+ * @return const char* String imutável contendo a cor (por exemplo nome ou código).
+ *
+ */
 const char* linha_get_cor(const Linha l);
 
  /*--------------FUNÇÕES SETTERS ----------------------*/
 
- //define o valor de x1 para a linha
- void linha_set_x1(Linha l, float x1);
+/**
+ * @brief Define a coordenada X do primeiro ponto da linha.
+ *
+ * @param l Instância da Linha cujo X1 será atualizado.
+ * @param x1 Novo valor da coordenada X1.
+ *
+ * @note Comportamento indefinido se 'l' não for uma instância válida.
+ */
+void linha_set_x1(Linha l, float x1);
 
- //define o valor de y1 para a linha
- void linha_set_y1(Linha l, float y1);
+/**
+ * @brief Define a coordenada Y do primeiro ponto da linha.
+ *
+ * @param l Instância da Linha cujo Y1 será atualizado.
+ * @param y1 Novo valor da coordenada Y1.
+ *
+ */
+void linha_set_y1(Linha l, float y1);
 
-//define o valor de x2 para a linha
- void linha_set_x2(Linha l, float x2);
+/**
+ * @brief Define a coordenada X do segundo ponto da linha.
+ *
+ * @param l Instância da Linha cujo X2 será atualizado.
+ * @param x2 Novo valor da coordenada X2.
+ *
+ */
+void linha_set_x2(Linha l, float x2);
 
-//define o valor de y2 para a linha
- void linha_set_y2(Linha l, float y2);
+/**
+ * @brief Define a coordenada Y do segundo ponto da linha.
+ *
+ * @param l Instância da Linha cujo Y2 será atualizado.
+ * @param y2 Novo valor da coordenada Y2.
+ *
+ */
+void linha_set_y2(Linha l, float y2);
 
-//define a cor da linha
- void linha_set_cor(Linha l, const char* cor);
+/**
+ * @brief Define a cor associada à linha.
+ *
+ * @param l Instância da Linha cuja cor será atualizada.
+ * @param cor String representando a cor (por exemplo nome ou código).
+ *
+ */
+void linha_set_cor(Linha l, const char* cor);
 
 #endif

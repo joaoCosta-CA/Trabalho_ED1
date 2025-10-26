@@ -83,22 +83,163 @@ void svg_desenhar_chao(FILE* arquivo_svg, Chao chao);
  */
 void svg_finalizar(FILE* arquivo_svg);
 
+/**
+ * @brief Obtém o identificador associado a uma forma geométrica.
+ *
+ * Retorna o ID que identifica a forma passada como argumento. O ID é
+ * normalmente usado para referenciação e busca de propriedades específicas
+ * da forma.
+ *
+ * @param forma Instância (ou ponteiro) da forma geométrica cujo ID será
+ *              obtido.
+ * @return int Valor do identificador da forma. Em caso de forma inválida
+ *             (por exemplo, NULL ou estrutura sem ID definido) a função
+ *             retorna um valor indicativo de erro (por exemplo, -1).
+ * 
+ * @pre  'forma' deve representar uma forma válida; caso contrário o valor
+ *       de retorno indica erro.
+ */
 int forma_get_id(FormaGeometrica forma);
+
+/**
+ * @brief Libera todos os recursos associados a uma forma geométrica.
+ *
+ * Esta função deve desalocar toda a memória e recursos internos usados pela
+ * forma (dados geométricos, strings, listas internas, etc.), garantindo que
+ * não haja vazamento de memória.
+ *
+ * @param forma Instância (ou ponteiro) da forma geométrica a ser destruída.
+ *
+ * @note Após a chamada, qualquer acesso a 'forma' é indefinido.
+ * @note Se 'forma' for NULL, a função não realiza nenhuma ação.
+ * @post  Recursos associados à forma foram liberados e não devem ser usados
+ *        novamente.
+ */
 void destruir_forma_completa(FormaGeometrica forma);
 
-// Funções para obter coordenadas (necessárias para anotações)
-double forma_get_x(FormaGeometrica forma); // Retorna a coordenada X principal (centro, canto, âncora)
-double forma_get_y(FormaGeometrica forma); // Retorna a coordenada Y principal
 
-// Funções para cores (necessárias para clonagem/alteração)
+/**
+ * @brief Retorna a coordenada X da forma geométrica.
+ *
+ * Obtém a coordenada X do ponto de referência da FormaGeometrica fornecida.
+ * A função não altera o estado da estrutura passada como argumento.
+ *
+ * @param forma Estrutura FormaGeometrica devidamente inicializada.
+ * @return Coordenada X da forma (valor em double).
+ */
+double forma_get_x(FormaGeometrica forma);
+
+/**
+ * @brief Retorna a coordenada Y da forma geométrica.
+ *
+ * Obtém a coordenada Y do ponto de referência da FormaGeometrica fornecida.
+ * A função não altera o estado da estrutura passada como argumento.
+ *
+ * @param forma Estrutura FormaGeometrica devidamente inicializada.
+ * @return Coordenada Y da forma (valor em double).
+ */
+double forma_get_y(FormaGeometrica forma);
+
+
+/**
+ * Retorna a cor de preenchimento da forma.
+ *
+ * @param forma    Instância válida de FormaGeometrica (não-NULL).
+ *
+ * @return Ponteiro para uma string NUL-terminada que representa a cor de preenchimento
+ *         (por exemplo nome ou código da cor). O ponteiro aponta para memória gerida
+ *         internamente pela forma; o chamador NÃO deve modificar nem liberar essa string.
+ *         A validade do ponteiro está vinculada ao ciclo de vida da forma e pode ser
+ *         alterada por operações que modifiquem a forma.
+ *
+ * @note Se 'forma' for NULL, o comportamento é indefinido (ou a função poderá retornar NULL,
+ *       conforme a implementação). Esta função não é necessariamente thread-safe; sincronize
+ *       acessos concorrentes externamente.
+ */
 const char* forma_get_cor_preenchimento(FormaGeometrica forma);
+
+/**
+ * Retorna a cor da borda da forma.
+ *
+ * @param forma    Instância válida de FormaGeometrica (não-NULL).
+ *
+ * @return Ponteiro para uma string NUL-terminada que representa a cor da borda.
+ *         O ponteiro aponta para memória interna da forma; o chamador NÃO deve
+ *         modificar nem liberar essa string. A validade do ponteiro depende do
+ *         ciclo de vida e do estado da forma.
+ *
+ * @note Se 'forma' for NULL, o comportamento é indefinido (ou a função poderá retornar NULL,
+ *       conforme a implementação). Esta função não é necessariamente thread-safe; sincronize
+ *       acessos concorrentes externamente.
+ */
 const char* forma_get_cor_borda(FormaGeometrica forma);
+
+/**
+ * Define a cor da borda da forma.
+ *
+ * @param forma     Instância válida de FormaGeometrica (não-NULL).
+ * @param nova_cor  String NUL-terminada com o nome ou código da nova cor (deve ser não-NULL).
+ *
+ * @behavior A função atualiza a cor da borda da forma para o valor fornecido.
+ *           Implementações devem copiar o conteúdo de 'nova_cor' para armazenamento
+ *           interno ou documentar claramente a política de ownership; após a chamada,
+ *           o chamador pode modificar ou liberar a string passada.
+ *
+ * @effects Substitui a cor de borda anterior pela nova. Em caso de falha (por exemplo,
+ *          falha de alocação), o estado da forma deverá permanecer inalterado.
+ *
+ * @note 'forma' e 'nova_cor' devem ser válidos; passar NULL resulta em comportamento
+ *       indefinido, salvo indicação contrária na implementação. A operação não é
+ *       necessariamente thread-safe; proteja acessos concorrentes externamente.
+ */
 void forma_set_cor_borda(FormaGeometrica forma, const char* nova_cor);
 
-// Função de clonagem
+
+/**
+ * @brief Cria uma cópia (clone) de uma FormaGeometrica.
+ *
+ * Esta função realiza uma cópia profunda da forma fornecida, duplicando
+ * quaisquer recursos internos necessários (por exemplo, buffers, listas,
+ * cadeias de caracteres) para que o clone seja independente da forma original.
+ *
+ * @param forma_original
+ *     A FormaGeometrica a ser clonada. A forma original não é modificada.
+ *
+ * @param proximo_id
+ *     Ponteiro para um inteiro usado para atribuir um novo identificador ao
+ *     clone. Se proximo_id for != NULL, o clone recebe como id o valor
+ *     apontado por proximo_id e o inteiro apontado é incrementado
+ *     (*proximo_id)++ para preparar o próximo id disponível. Se proximo_id
+ *     for NULL, o clone preserva o id da forma_original.
+ *
+ * @return
+ *     Uma nova FormaGeometrica contendo a cópia profunda da forma_original.
+ *     O chamador é responsável por liberar quaisquer recursos alocados pelo
+ *     clone usando a função apropriada do módulo (por exemplo, uma função
+ *     de destruição/liberação de forma).
+ *
+ * @note
+ *     - Em caso de falha de alocação, o comportamento depende da implementação
+ *       concreta; recomenda-se verificar/validar o objeto retornado conforme as
+ *       convenções do projeto (por exemplo, um id inválido ou um campo interno
+ *       NULL).  
+ *     - A função faz uma cópia completa; modificações no clone não afetam a
+ *       forma_original e vice-versa.
+ */
 FormaGeometrica forma_clonar(FormaGeometrica forma_original, int* proximo_id);
 
-// Função para obter o maior ID usado no arquivo .geo
+
+/**
+ * @brief Retorna o maior identificador (ID) entre as formas presentes no Chao.
+ *
+ * Percorre a fila principal de formas contida em 'chao' e retorna o maior ID
+ * atualmente em uso. Útil para atribuição de novos IDs ou para consultas de
+ * consistência.
+ *
+ * @param chao Ponteiro opaco para o estado do leitor_geo.
+ * @return O maior ID encontrado (valor >= 0). Retorna -1 se 'chao' for NULL ou
+ *         se não houver formas registradas.
+ */
 int leitor_geo_get_max_id(Chao chao);
 
 #endif
