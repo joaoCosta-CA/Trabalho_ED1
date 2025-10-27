@@ -36,14 +36,14 @@ Texto criar_texto(int id, float x, float y, const char* corb, const char* corp, 
     novo_texto->id = id;
     novo_texto->x = x;
     novo_texto->y = y;
-    novo_texto->area = texto_calc_area((Texto)novo_texto);
     novo_texto->ancora = ancora;
 
     snprintf(novo_texto->corb, TAMANHO_COR, "%s", corb ? corb : "");
     snprintf(novo_texto->corp, TAMANHO_COR, "%s", corp ? corp : "");
     snprintf(novo_texto->conteudo, TAMANHO_CONTEUDO, "%s", conteudo ? conteudo : "");
 
-    // Retorna o ponteiro para a estrutura como um ponteiro opaco 'Texto' (void*).
+    novo_texto->area = texto_calc_area((Texto)novo_texto);
+
     return novo_texto;
 }
 

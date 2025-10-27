@@ -66,13 +66,22 @@ int pilha_tamanho(const PILHA pilha_g){
     return pilha->tamanho;
 }
 
+// Em pilha.c
 void destruirPilha(PILHA pilha_g){
     Pilha* pilha = (Pilha*)pilha_g;
-    if(!pilha)return;
-
-    while(pilha->tamanho > 0){
-        pop(pilha);
+    if (pilha == NULL) {
+        return;
     }
+
+    if (pilha->tamanho > 0) {
+         Node atual = pilha->topo;
+         while (atual != NULL) {
+             Node proximo = atual->prox;
+             free(atual);
+             atual = proximo;
+         }
+    }
+    free(pilha);
 }
 
 void* pilha_get_topo_debug(PILHA pilha_g) {

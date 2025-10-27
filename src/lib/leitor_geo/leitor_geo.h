@@ -2,6 +2,7 @@
 #define LEITOR_GEO_H
 #include "../ler_arq/leitor.h"
 #include "../fila/fila.h"
+#include "../pilha/pilha.h"
 #include "../formas/formas.h"
 #include <stdio.h>
 
@@ -241,5 +242,15 @@ FormaGeometrica forma_clonar(FormaGeometrica forma_original, int* proximo_id);
  *         se não houver formas registradas.
  */
 int leitor_geo_get_max_id(Chao chao);
+
+
+/**
+ * @brief Obtém um ponteiro para a pilha de gerenciamento de memória.
+ * Esta pilha rastreia todos os invólucros de formas alocados
+ * que precisam ser liberados no final do programa.
+ * @param chao O ponteiro opaco para o estado do leitor_geo.
+ * @return A PILHA usada para gerenciamento de memória.
+ */
+PILHA leitor_geo_get_pilha_gestao(Chao chao);
 
 #endif

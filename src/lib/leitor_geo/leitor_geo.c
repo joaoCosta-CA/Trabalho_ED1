@@ -62,6 +62,7 @@ Chao processar_arquivo_geo(DadosArquivo dados_arquivo, const char *caminho_saida
         if (comando && comando[0] != '\0') {
             despachar_comando(comando, processador);
         }
+        free(linha);
     }
 
     const char *nome_base = obter_nome_arquivo(dados_arquivo);
@@ -88,8 +89,6 @@ Chao processar_arquivo_geo(DadosArquivo dados_arquivo, const char *caminho_saida
     return (Chao)processador;
 }
 
-// Em leitor_geo.c
-// Em destruir_formas_geo (leitor_geo.c)
 void destruir_formas_geo(Chao chao) {
     ProcessadorDeFormas *processador = (ProcessadorDeFormas *)chao;
     if (!processador) return;
@@ -101,16 +100,8 @@ void destruir_formas_geo(Chao chao) {
         if (forma_ptr) {
             FormaGeometricaStruct *forma = (FormaGeometricaStruct*) forma_ptr; 
             void* dados = forma->dados_da_forma; // Ponteiro para retangulo, circulo, etc.
-
             if (dados != NULL) { 
-                switch (forma->tipo) {
-                    case CIRCULO: DestruirCirc(dados); break; 
-                    case RETANGULO: destruirRec(dados); break;
-                    case LINHA: destruirLinha(dados); break;
-                    case TEXTO: destruirTexto(dados); break;
-                    case ESTILO_TEXTO: estilo_texto_destruir(dados); break;
-                    default: break;
-                }
+               free(dados);
             }
             free(forma); 
         }
@@ -505,11 +496,12 @@ void svg_desenhar_chao(FILE* arquivo_svg, Chao chao) {
 
     while (iterador_tem_proximo(it)) {
         FormaGeometricaStruct *forma = (FormaGeometricaStruct *)iterador_obter_proximo(it);
-        // Desenha apenas tipos visuais
         if (forma->tipo == CIRCULO || forma->tipo == RETANGULO || forma->tipo == LINHA || forma->tipo == TEXTO) {
             desenhar_forma_svg(arquivo_svg, forma);
         }
     }
+
+    iterador_destruir(it);
 }
 
 void svg_finalizar(FILE* arquivo_svg) {
@@ -701,4 +693,12 @@ FormaGeometrica forma_clonar(FormaGeometrica forma_original, int* proximo_id) {
     capsula_clone->dados_da_forma = dados_clonados;
 
     return (FormaGeometrica)capsula_clone;
+}
+
+PILHA leitor_geo_get_pilha_gestao(Chao chao) {
+    ProcessadorDeFormas *proc = (ProcessadorDeFormas *)chao;
+    if (!proc) {
+        return NULL;
+    } 
+    return proc->pilha_gerenciamento_memoria;
 }

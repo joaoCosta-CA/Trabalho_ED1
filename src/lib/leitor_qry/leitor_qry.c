@@ -412,13 +412,10 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
             double area_j = forma_get_area(forma_j);
 
             if (area_i < area_j) {
-                // REGRA: I é esmagado. J sobrevive.
                 area_esmagada_round += area_i;
                 (*contador_esmagados)++;
                 fprintf(log_txt, "SOBREPOSICAO: Forma I (id %d, area %.2f) esmagada pela Forma J (id %d, area %.2f).\n", forma_get_id(forma_i), area_i, forma_get_id(forma_j), area_j);
 
-                // Armazenar coordenadas de 'forma_i' para desenhar o asterisco no SVG.
-                // Assumindo que forma_get_x/y existem
                 double x_esmag = forma_get_x(forma_i);
                 double y_esmag = forma_get_y(forma_i);
 
@@ -428,11 +425,10 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
                 nova_anot->x = x_esmag;
                 nova_anot->y = y_esmag;
 
-                destruir_forma_completa(forma_i); // Destrói I (invólucro e dados)
+                destruir_forma_completa(forma_i);
                 forma_i = forma_j; // J sobrevive e se torna o 'i' da próxima iteração
 
             } else {
-                // REGRA: I sobrepõe J. I altera J, I é clonado. Ambos voltam + clone.
                 fprintf(log_txt, "SOBREPOSICAO: Forma I (id %d) altera Forma J (id %d) e eh clonada.\n", forma_get_id(forma_i), forma_get_id(forma_j));
 
                 // Implementar lógica de troca de cor
@@ -442,10 +438,11 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
                    forma_set_cor_borda(forma_j, cor_preenchimento_i);
                 }
 
-                // Assumindo que forma_clonar existe, troca cores e atualiza *proximo_id_clone
                 FormaGeometrica clone_i = forma_clonar(forma_i, proximo_id_clone);
                 if (clone_i) {
                     insertFila(fila_clones, clone_i); // Adiciona clone à fila separada
+                    PILHA pilha_gestao = leitor_geo_get_pilha_gestao(chao);
+                    push(pilha_gestao, clone_i);
                      (*contador_clonados)++;
                 } else {
                      fprintf(stderr, "Erro ao clonar forma ID %d\n", forma_get_id(forma_i));
@@ -455,7 +452,6 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
                 forma_i = forma_j; // J (alterado) se torna o 'i' da próxima iteração
             }
         } else {
-            // REGRA: Sem sobreposição, ambos voltam.
             fprintf(log_txt, "SEM SOBREPOSICAO: As formas com id %d e %d retornam ao chao.\n", forma_get_id(forma_i), forma_get_id(forma_j));
             insertFila(fila_retorno, forma_i);
             forma_i = forma_j;
@@ -473,31 +469,16 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
     FILA fila_do_chao = leitor_geo_get_fila_principal(chao);
 
     while (!fila_vazia(fila_retorno)) {
-        printf("DEBUG [calc - FIM]: Topo do loop de retorno.\n");
-        fflush(stdout);
 
         FormaGeometrica forma_a_retornar = removeFila(fila_retorno);
-
-        printf("DEBUG [calc - FIM]: Removido ponteiro %p (ID %d) da fila_retorno.\n",
-               (void*)forma_a_retornar, forma_get_id(forma_a_retornar));
         fflush(stdout);
         if (!forma_a_retornar) { 
             fprintf(stderr, "ERRO: removeFila(fila_retorno) retornou NULL!\n"); 
-            break; // Evita usar ponteiro NULL
+            break;
         }
 
-        printf("DEBUG [calc - FIM]: Inserindo ID %d na fila_do_chao (%p)...\n",
-               forma_get_id(forma_a_retornar), (void*)fila_do_chao);
-        fflush(stdout);
-
         insertFila(fila_do_chao, forma_a_retornar);
-
-        printf("DEBUG [calc - FIM]: Inserido na fila_do_chao. OK.\n");
-        fflush(stdout);
-
     }
-    printf("DEBUG [calc - FIM]: Fim do loop while de retorno. Chamando destruirFila(fila_retorno)...\n");
-    fflush(stdout);
 
     destruirFila(fila_retorno);
 
@@ -538,8 +519,8 @@ static bool circulo_circulo_sobrepoe(FormaGeometrica c1_forma, FormaGeometrica c
     double x1 = circulo_get_x(c1), y1 = circulo_get_y(c1), r1 = circulo_get_raio(c1);
     double x2 = circulo_get_x(c2), y2 = circulo_get_y(c2), r2 = circulo_get_raio(c2);
 
-    double distSq = pow(x1 - x2, 2) + pow(y1 - y2, 2); // Distância ao quadrado
-    double radiiSumSq = pow(r1 + r2, 2); // Soma dos raios ao quadrado
+    double distSq = pow(x1 - x2, 2) + pow(y1 - y2, 2);
+    double radiiSumSq = pow(r1 + r2, 2);
 
     return distSq <= radiiSumSq;
 }
@@ -608,8 +589,8 @@ static bool texto_get_segmento(FormaGeometrica texto_forma, double* x1, double* 
 }
 static int orientacao(double px, double py, double qx, double qy, double rx, double ry) {
     double val = (qy - py) * (rx - qx) - (qx - px) * (ry - qy);
-    if (fabs(val) < 1e-9) return 0; // Colinear (usando tolerância para ponto flutuante)
-    return (val > 0) ? 1 : 2; // Horário ou Anti-horário
+    if (fabs(val) < 1e-9) return 0;
+    return (val > 0) ? 1 : 2;
 }
 
 static bool no_segmento(double px, double py, double qx, double qy, double rx, double ry) {
@@ -624,10 +605,8 @@ static bool linha_linha_sobrepoe(double p1x, double p1y, double q1x, double q1y,
     int o3 = orientacao(p2x, p2y, q2x, q2y, p1x, p1y);
     int o4 = orientacao(p2x, p2y, q2x, q2y, q1x, q1y);
 
-    // Caso Geral: os segmentos se cruzam
     if (o1 != o2 && o3 != o4) return true;
 
-    // Casos Especiais (Colineares e se sobrepõem)
     if (o1 == 0 && no_segmento(p1x, p1y, p2x, p2y, q1x, q1y)) return true;
     if (o2 == 0 && no_segmento(p1x, p1y, q2x, p2y, q1x, q1y)) return true;
     if (o3 == 0 && no_segmento(p2x, p2y, p1x, p1y, q2x, q2y)) return true;

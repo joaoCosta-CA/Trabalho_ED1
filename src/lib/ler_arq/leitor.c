@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "../fila/fila.h"
 #include "leitor.h"
 
 
@@ -81,6 +82,7 @@ void dados_arquivo_destruir(DadosArquivo dados) {
         char* linha = (char*)removeFila(info->fila_de_linhas);
         free(linha);
     }
+
 
     // Libera a memória da própria fila e da estrutura principal
     destruirFila(info->fila_de_linhas);
