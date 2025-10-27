@@ -1,7 +1,7 @@
-#include "lib/argumentos/argumentos.h"
-#include "lib/ler_arq/leitor.h"
-#include "lib/leitor_geo/leitor_geo.h"
-#include "lib/leitor_qry/leitor_qry.h"
+#include "argumentos.h"
+#include "leitor.h"
+#include "leitor_geo.h"
+#include "leitor_qry.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
