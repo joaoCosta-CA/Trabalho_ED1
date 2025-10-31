@@ -1,4 +1,5 @@
 #include "leitor_geo.h"
+#include "complementar.h"  
 #include "fila.h"
 #include "pilha.h"
 #include "leitor.h"
@@ -505,7 +506,16 @@ double forma_get_x(FormaGeometrica forma) {
     switch (forma_get_tipo(forma)) {
         case CIRCULO: return circulo_get_x(dados);
         case RETANGULO: return retangulo_get_x(dados);
-        case LINHA: return linha_get_x1(dados);
+        case LINHA: { // Lógica da Nova Regra
+            double x1 = linha_get_x1(dados);
+            double x2 = linha_get_x2(dados);
+            if (x1 < x2) return x1;
+            if (x2 < x1) return x2;
+            // Se x1 == x2 (empate)
+            double y1 = linha_get_y1(dados);
+            double y2 = linha_get_y2(dados);
+            return (y1 <= y2) ? x1 : x2;
+            }
         case TEXTO: return texto_get_x(dados);
         default: return 0.0;
     }
@@ -517,7 +527,16 @@ double forma_get_y(FormaGeometrica forma) {
     switch (forma_get_tipo(forma)) {
         case CIRCULO: return circulo_get_y(dados);
         case RETANGULO: return retangulo_get_y(dados);
-        case LINHA: return linha_get_y1(dados);
+        case LINHA: { // Lógica da Nova Regra
+            double x1 = linha_get_x1(dados);
+            double y1 = linha_get_y1(dados);
+            double x2 = linha_get_x2(dados);
+            double y2 = linha_get_y2(dados);
+            if (x1 < x2) return y1; // Y do ponto com menor X
+            if (x2 < x1) return y2; // Y do ponto com menor X
+            // Se x1 == x2 (empate), retorna o menor Y
+            return (y1 <= y2) ? y1 : y2;
+        }
         case TEXTO: return texto_get_y(dados);
         default: return 0.0;
     }
@@ -530,7 +549,7 @@ const char* forma_get_cor_preenchimento(FormaGeometrica forma) {
         case CIRCULO: return circulo_get_corp(dados);
         case RETANGULO: return retangulo_get_corp(dados);
         case TEXTO: return texto_get_corp(dados);
-        case LINHA: return NULL;
+        case LINHA: return cor_get_complementar(linha_get_cor(dados));
         default: return NULL;
     }
 }
