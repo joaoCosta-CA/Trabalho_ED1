@@ -1,13 +1,23 @@
 #ifndef RETANGULO_H
 #define RETANGULO_H
 
+/**
+ * @file retangulo.h
+ * @brief Módulo de implementação da estrutura de dados Retângulo
+ * 
+ * Este módulo fornece uma implementação completa para manipulação de retângulos
+ * geométricos em um espaço bidimensional. Cada retângulo é definido por uma posição
+ * (x, y), dimensões (largura e altura), cores de preenchimento e borda, além de
+ * possuir um identificador único.
+ * 
+ * @note A estrutura utiliza encapsulamento através de ponteiro opaco (void*),
+ *       garantindo abstração completa da implementação interna.
+ * @note Todas as funções getter são seguras para uso e retornam valores válidos
+ *       quando recebem uma instância de Retangulo válida.
+ */
+
 typedef void* Retangulo;
 
-/*
-    arquivo destina para a organização de todas as funções e modificações para a forma retangulo
-*/
-
-Retangulo criarRec(int id, float x, float y, double w, double h, const char* corb, const char* corp);
 /**
  * @brief cria um retangulo de área WxH 
  * @param id, um valor int que identifica o retangulo criado
@@ -16,14 +26,13 @@ Retangulo criarRec(int id, float x, float y, double w, double h, const char* cor
  * @param corp, é a cor que o retangulo terá no seu interior
  * @param corb, é a cor que a borda do retangula deverá ter
  */
+Retangulo criarRec(int id, float x, float y, double w, double h, const char* corb, const char* corp);
 
-void destruirRec(Retangulo r);
 /**
  * @brief libera a memória alocada para o retangulo
  * @param r, ponteiro para o retangulo a ser destruído
  */
-
-/*----------FUNÇÕES GETTERS------------*/
+void destruirRec(Retangulo r);
 
 /**
  * @brief Retorna o identificador inteiro do retângulo.
@@ -92,8 +101,6 @@ const char* retangulo_get_corb(const Retangulo r);
  * @return double Área calculada (largura * altura).
  */
 double retangulo_get_area(const Retangulo r);
-
-/*-----------FUNÇÕES SETTERS-----------------*/
 
 /**
  * Define a coordenada X do retângulo.

@@ -1,14 +1,23 @@
 #ifndef LINHA_H
 #define LINHA_H
 
+/**
+ * @file linha.h
+ * @brief Módulo de implementação da estrutura de dados Linha
+ * 
+ * Este módulo fornece uma implementação completa para manipulação de linhas
+ * geométricas em um espaço bidimensional. Cada linha é definida por dois pontos
+ * (x1, y1) e (x2, y2) que determinam sua posição e orientação, além de possuir
+ * um identificador único e uma cor associada.
+ * 
+ * @note A estrutura utiliza encapsulamento através de ponteiro opaco (void*),
+ *       garantindo abstração completa da implementação interna.
+ * @note Todas as funções getter são seguras para uso e retornam valores válidos
+ *       quando recebem uma instância de Linha válida.
+ */
+
 typedef void* Linha;
 
-
-/*
-    arquivo destina para a organização de todas as funções e modificações para a forma linha
-*/
-
-Linha criarLinha(int id, float x1, float y1, float x2, float y2, const char* cor);
 /**
  * @brief cria uma linha com os pontos (x1,y1) e (x2,y2)
  * @param id, um valor int que identifica a linha criada
@@ -19,6 +28,7 @@ Linha criarLinha(int id, float x1, float y1, float x2, float y2, const char* cor
  * @param corp, é a cor que a linha terá no seu interior
  * @param corb, é a cor que a borda da linha deverá ter
  */
+Linha criarLinha(int id, float x1, float y1, float x2, float y2, const char* cor);
 
 /**
  * @brief Libera os recursos associados a uma Linha.

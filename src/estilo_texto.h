@@ -18,8 +18,7 @@ typedef void *EstiloTexto;
  * @param tamanho_fonte Um valor inteiro para o tamanho da fonte.
  * @return Um ponteiro para a nova instância de EstiloTexto ou NULL em caso de falha.
  */
-EstiloTexto estilo_texto_criar(const char *familia_fonte, char peso_fonte,
-                               int tamanho_fonte);
+EstiloTexto estilo_texto_criar(const char *familia_fonte, char peso_fonte, int tamanho_fonte);
 
 /**
  * @brief Libera todos os recursos associados a uma instância de EstiloTexto.

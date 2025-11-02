@@ -1,5 +1,4 @@
 // Arquivo: leitor_qry.h
-
 #ifndef LEITOR_QRY_H
 #define LEITOR_QRY_H
 

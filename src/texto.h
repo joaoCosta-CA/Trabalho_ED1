@@ -37,8 +37,6 @@ float area_texto(const Texto t);
  */
 void destruirTexto(Texto t);
 
-
-/*---------------FUNÇÕES GETTERS-------------------*/
 /**
  * @brief Retorna o identificador do objeto Texto.
  *
@@ -136,7 +134,6 @@ const char *texto_get_corp(const Texto t);
  */
 const char *texto_get_conteudo(const Texto t);
 
-/*---------------FUNÇÕES SETTERS-------------------*/
 /**
  * @brief Define a coordenada X do objeto Texto.
  *

@@ -8,7 +8,6 @@
 // Ponteiro opaco para o Disparador
 typedef void* Disp;
 
-// --- FUNÇÕES DE CICLO DE VIDA ---
 /**
  * @brief Cria e inicializa um novo disparador.
  *
@@ -39,7 +38,6 @@ Disp criar_disparador(int id, double x, double y);
  */
 void destruir_disparador(Disp disp);
 
-// --- FUNÇÕES DE CONFIGURAÇÃO ---
 /**
  * @brief Ajusta a posição do disparador.
  *
@@ -70,7 +68,6 @@ void posicionar_disparador(Disp disp, double x, double y);
  */
 void anexar_carregadores(Disp disp, Carregador carregador_esq, Carregador carregador_dir);
 
-// --- FUNÇÕES DE AÇÃO ---
 /**
  * @brief Desloca a carga/munição ativa do disparador para um dos lados.
  *
@@ -133,7 +130,6 @@ void disparar_forma(Disp disp, double dx, double dy, FILA arena);
  */
 int rajada_de_disparos(Disp disp, char lado, double dx, double dy, double ix, double iy, FILA arena);
 
-// --- FUNÇÕES DE ACESSO (GETTERS) ---
 /**
  * @brief Retorna o identificador numérico do disparador.
  *

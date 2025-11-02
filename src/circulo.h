@@ -2,12 +2,19 @@
 #define CIRCULO_H
 
 /*
-   aqruivo destina para todas as funções que gerenciam a criação e mudanças do objeto circulo 
-*/
+ * Módulo de gerenciamento de círculos (Circulo).
+ *
+ * Este arquivo contém a interface pública para criação, destruição, acesso e modificação
+ * de objetos Círculo. Cada círculo possui um identificador único, coordenadas (x, y),
+ * raio, cor de borda (stroke) e cor de preenchimento (fill).
+ *
+ * O módulo utiliza um tipo opaco (handle) para encapsular a implementação dos círculos
+ * e fornece funções getter/setter para manipulação das propriedades, além de cálculos
+ * de área.
+ */
 
 typedef void* Circulo;/*typedef de um ponteiro opaco para 'CIRCULO'*/
 
-Circulo CriarCirc(int id, float x, float y, double r, const char* corb, const char* corp);
 /** 
  * @brief cria um circulo com os parametros fornecidos
  * @param id é um inteiro usado para identificar a forma criada
@@ -17,14 +24,17 @@ Circulo CriarCirc(int id, float x, float y, double r, const char* corb, const ch
  * @param corb é a cor de preenchimento da borda do circulo (ex:#000000) 
  * @param corp é a cor de preenchimento da área interior do circulo (ex:#000000)
 */
+Circulo CriarCirc(int id, float x, float y, double r, const char* corb, const char* corp);
 
-void DestruirCirc(Circulo c); 
-/**      
- * @brief libera a memória alocada para o circulo
+/** 
+ * Destroi um circulo.
+ *
  * @param c, ponteiro para o circulo a ser destruído
+ *
+ * @pre O parâmetro c deve referenciar um circulo válido.
+ * @note A função não retorna erro; o chamador não deve assumir que o circulo foi destruído caso a memória não tenha sido liberada.
  */
-
- /*-------------------FUNÇÕES GETTERS------------------------------*/
+void DestruirCirc(Circulo c); 
 
 /**
  * Obtém o identificador do círculo.
@@ -85,11 +95,6 @@ const char* circulo_get_corb(const Circulo c);
  *         não a libere nem a modifique.
  */
  const char* circulo_get_corp(const Circulo c);
- /*---------------------------------------------------*/
-
-
-
- /*-------FUNÇÕES SETTERS-----------------------------*/
 
 /**
  * @brief Define a coordenada X do círculo.
@@ -144,6 +149,4 @@ const char* circulo_get_corb(const Circulo c);
  *       Se c for NULL, o comportamento é indefinido.
  */
  void circulo_set_corb(Circulo c, const char* corb);
-
- /*----------------------------------------------------*/
 #endif
