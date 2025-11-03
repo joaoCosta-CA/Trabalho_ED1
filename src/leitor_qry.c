@@ -389,6 +389,7 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
         return;
     }
 
+    // Processa pares consecutivos de formas da arena
     FormaGeometrica forma_i = removeFila(arena);
 
     while (!fila_vazia(arena)) {
@@ -397,14 +398,17 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
         bool sobrepoe = formas_se_sobrepoem(forma_i, forma_j);
 
         if (sobrepoe) {
+            // Formas se sobrepõem: verificar qual tem área maior
             double area_i = forma_get_area(forma_i);
             double area_j = forma_get_area(forma_j);
 
             if (area_i < area_j) {
+                // Forma I é menor: esmagada e destruída
                 area_esmagada_round += area_i;
                 (*contador_esmagados)++;
                 fprintf(log_txt, "SOBREPOSICAO: Forma I (id %d, area %.2f) esmagada pela Forma J (id %d, area %.2f).\n", forma_get_id(forma_i), area_i, forma_get_id(forma_j), area_j);
 
+                // Registrar posição do esmagamento
                 double x_esmag = forma_get_x(forma_i);
                 double y_esmag = forma_get_y(forma_i);
 
@@ -418,13 +422,16 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
                 forma_i = forma_j;
 
             } else {
+                // Forma I é maior ou igual: clona e altera cor da forma J
                 fprintf(log_txt, "SOBREPOSICAO: Forma I (id %d) altera Forma J (id %d) e eh clonada.\n", forma_get_id(forma_i), forma_get_id(forma_j));
 
+                // Aplica cor de preenchimento da forma I na borda da forma J
                 const char* cor_preenchimento_i = forma_get_cor_preenchimento(forma_i);
                 if (cor_preenchimento_i) {
                    forma_set_cor_borda(forma_j, cor_preenchimento_i);
                 }
 
+                // Clona forma I e adiciona à pilha de gerenciamento
                 FormaGeometrica clone_i = forma_clonar(forma_i, proximo_id_clone);
                 if (clone_i) {
                     insertFila(fila_clones, clone_i);
@@ -439,24 +446,26 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
                 forma_i = forma_j;
             }
         } else {
+            // Formas não se sobrepõem: ambas retornam ao chão
             fprintf(log_txt, "SEM SOBREPOSICAO: As formas com id %d e %d retornam ao chao.\n", forma_get_id(forma_i), forma_get_id(forma_j));
             insertFila(fila_retorno, forma_i);
             forma_i = forma_j;
         }
     }
 
+    // Adiciona última forma processada e todos os clones à fila de retorno
     insertFila(fila_retorno, forma_i);
 
     while (!fila_vazia(fila_clones)) {
         insertFila(fila_retorno, removeFila(fila_clones));
     }
 
+    // Retorna todas as formas processadas ao chão
     FILA fila_do_chao = leitor_geo_get_fila_principal(chao);
 
     while (!fila_vazia(fila_retorno)) {
 
         FormaGeometrica forma_a_retornar = removeFila(fila_retorno);
-        fflush(stdout);
         if (!forma_a_retornar) { 
             fprintf(stderr, "ERRO: removeFila(fila_retorno) retornou NULL!\n"); 
             break;
@@ -638,27 +647,33 @@ static bool retangulo_linha_sobrepoe(FormaGeometrica rect_forma, double lx1, dou
 
 
 static bool formas_se_sobrepoem(FormaGeometrica forma1, FormaGeometrica forma2) {
+    // Validação: verifica se ambas as formas são válidas
     if (!forma1 || !forma2) {
         return false;
     }
 
+    // Obtém os tipos das formas para determinar o algoritmo de sobreposição
     ShapeType tipo1 = forma_get_tipo(forma1);
     ShapeType tipo2 = forma_get_tipo(forma2);
 
+    // Variáveis para armazenar coordenadas de segmentos (linhas ou textos tratados como segmentos)
     double l1x1=0, l1y1=0, l1x2=0, l1y2=0;
     double l2x1=0, l2y1=0, l2x2=0, l2y2=0;
     bool forma1_eh_segmento = false;
     bool forma2_eh_segmento = false;
 
+    // Extrai coordenadas de segmento da forma1 (se for LINHA ou TEXTO)
     if (tipo1 == LINHA) {
         void* d1 = forma_get_dados(forma1);
         l1x1 = linha_get_x1(d1); l1y1 = linha_get_y1(d1);
         l1x2 = linha_get_x2(d1); l1y2 = linha_get_y2(d1);
         forma1_eh_segmento = true;
     } else if (tipo1 == TEXTO) {
+        // TEXTO pode ser tratado como segmento se tiver uma representação linear
         forma1_eh_segmento = texto_get_segmento(forma1, &l1x1, &l1y1, &l1x2, &l1y2);
     }
 
+    // Extrai coordenadas de segmento da forma2 (se for LINHA ou TEXTO)
     if (tipo2 == LINHA) {
         void* d2 = forma_get_dados(forma2);
         l2x1 = linha_get_x1(d2); l2y1 = linha_get_y1(d2);
@@ -668,31 +683,41 @@ static bool formas_se_sobrepoem(FormaGeometrica forma1, FormaGeometrica forma2) 
         forma2_eh_segmento = texto_get_segmento(forma2, &l2x1, &l2y1, &l2x2, &l2y2);
     }
 
+    // Dispatcher: escolhe a função de sobreposição baseada nos tipos das formas
+    // Caso 1: forma1 é CIRCULO
     if (tipo1 == CIRCULO) {
         if (tipo2 == CIRCULO) {
             return circulo_circulo_sobrepoe(forma1, forma2);
         } else if (tipo2 == RETANGULO) {
             return circulo_retangulo_sobrepoe(forma1, forma2);
         } else if (forma2_eh_segmento) {
+            // Círculo com linha ou texto (tratado como segmento)
             return circulo_linha_sobrepoe(forma1, l2x1, l2y1, l2x2, l2y2);
         }
-    } else if (tipo1 == RETANGULO) {
+    } 
+    // Caso 2: forma1 é RETANGULO
+    else if (tipo1 == RETANGULO) {
         if (tipo2 == CIRCULO) {
+            // Inverte ordem para reutilizar função círculo-retângulo
             return circulo_retangulo_sobrepoe(forma2, forma1); 
         } else if (tipo2 == RETANGULO) {
             return retangulo_retangulo_sobrepoe(forma1, forma2);
         } else if (forma2_eh_segmento) {
             return retangulo_linha_sobrepoe(forma1, l2x1, l2y1, l2x2, l2y2);
         }
-    } else if (forma1_eh_segmento) {
+    } 
+    // Caso 3: forma1 é LINHA ou TEXTO (tratado como segmento)
+    else if (forma1_eh_segmento) {
         if (tipo2 == CIRCULO) {
             return circulo_linha_sobrepoe(forma2, l1x1, l1y1, l1x2, l1y2); 
         } else if (tipo2 == RETANGULO) {
             return retangulo_linha_sobrepoe(forma2, l1x1, l1y1, l1x2, l1y2); 
         } else if (forma2_eh_segmento) {
+            // Segmento com segmento (linha-linha, linha-texto, texto-texto)
             return linha_linha_sobrepoe(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1, l2x2, l2y2);
         }
     }
 
+    // Caso não tratado: não há sobreposição
     return false;
 }
