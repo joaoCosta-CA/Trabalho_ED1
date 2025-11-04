@@ -27,13 +27,14 @@ FILA criarFila();
 /**
  * @brief a função tem como serventia colocar um valor expecífico dentro da fila
  * @param 'fila' será um espaço de memória reservado utilizando malloc para conseguir guardar o valor inserido
- * @param 'valor' será um inteiro que virá a ser inserido dentro da fila(arrumar)
+ * @param 'valor' será um valor genérico que virá a ser inserido dentro da fila
  */
 void insertFila(FILA fila, void *valor);
 
 /**
  * @brief função para remover o primeiro elemnto da fila
- * @param 'fila' será a própria fila que ter a o valor removido e a memória liberada
+ * @param 'fila' será a própria fila que terá o valor removido e a memória liberada
+ * @return retorna um ponteiro para o valor removido ou NULL caso a fila esteja vazia ou a alocação de memória falhe
  */
 FILA removeFila(FILA fila);
 
@@ -59,28 +60,28 @@ int filaTamanho(FILA fila);
 
 /**
  * @brief Cria um iterador para percorrer a fila sem modificá-la.
- * @param fila A fila que será percorrida.
- * @return Um ponteiro para a estrutura do iterador.
+ * @param 'fila' será a fila que será percorrida.
+ * @return retorna um ponteiro para a estrutura do iterador ou NULL caso a alocação de memória falhe
  */
 IteradorFila fila_obter_iterador(FILA fila);
 
 /**
  * @brief Verifica se o iterador ainda possui um próximo elemento para visitar.
- * @param iterador O iterador da fila.
- * @return Retorna 1 (verdadeiro) se houver um próximo elemento, 0 (falso) caso contrário.
+ * @param 'iterador' será o iterador da fila.
+ * @return retorna 1 (verdadeiro) se houver um próximo elemento, 0 (falso) caso contrário.
  */
 int iterador_tem_proximo(IteradorFila iterador);
 
 /**
  * @brief Retorna o próximo elemento da fila e avança o iterador.
- * @param iterador O iterador da fila.
- * @return Um ponteiro para o dado do próximo elemento na fila.
+ * @param 'iterador' será o iterador da fila.
+ * @return retorna um ponteiro para o dado do próximo elemento na fila ou NULL caso o iterador esteja nulo ou o próximo elemento seja nulo
  */
 void *iterador_obter_proximo(IteradorFila iterador);
 
 /**
  * @brief Libera a memória alocada para o iterador.
- * @param iterador O iterador a ser destruído.
+ * @param 'iterador' será o iterador a ser destruído.
  */
 void iterador_destruir(IteradorFila iterador);
 

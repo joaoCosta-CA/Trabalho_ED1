@@ -21,42 +21,39 @@ typedef void *DadosArquivo;
 /**
  * @brief Cria uma nova instância de DadosArquivo, lendo o conteúdo do arquivo especificado.
  *
- * @param caminho_arquivo Caminho completo do arquivo a ser lido.
- * @return Ponteiro para DadosArquivo criado, ou NULL em caso de erro.
+ * @param 'caminho_arquivo' será o caminho completo do arquivo a ser lido.
+ * @return retorna um ponteiro para DadosArquivo criado, ou NULL em caso de erro.
  */
 DadosArquivo dados_arquivo_criar(const char *caminho_arquivo);
 
 /**
- * @brief Libera a memória alocada para DadosArquivo e todas as linhas armazenadas.
+ * @brief função que libera a memória alocada para DadosArquivo e todas as linhas armazenadas.
  *
- * @param dados Ponteiro para DadosArquivo a ser destruído.
+ * @param 'dados' será o ponteiro para DadosArquivo a ser destruído.
  */
 void dados_arquivo_destruir(DadosArquivo dados);
 
 /**
- * @brief Obtém o caminho completo do arquivo armazenado em DadosArquivo.
+ * @brief função que obtém o caminho completo do arquivo armazenado em DadosArquivo.
  *
- * @param dados Ponteiro para DadosArquivo.
+ * @param 'dados' será o ponteiro para DadosArquivo.
  * @return Ponteiro constante para a string com o caminho do arquivo.
  */
 const char *obter_caminho_arquivo(const DadosArquivo dados);
 
 /**
- * @brief Obtém o nome do arquivo (apenas o nome, sem o caminho).
+ * @brief função que obtém o nome do arquivo (apenas o nome, sem o caminho).
  *
- * @param dados Ponteiro para DadosArquivo.
- * @return Ponteiro constante para a string com o nome do arquivo.
+ * @param 'dados' será o ponteiro para DadosArquivo.
+ * @return retorna um ponteiro constante para a string com o nome do arquivo.
  */
 const char *obter_nome_arquivo(const DadosArquivo dados);
 
 /**
- * @brief Obtém a fila contendo as linhas do arquivo.
+ * @brief função que obtém a fila contendo as linhas do arquivo.
  *
- * Cada elemento da fila é uma string alocada dinamicamente contendo uma linha do arquivo.
- * O usuário é responsável por tratar esses dados com cuidado.
- *
- * @param dados Ponteiro para DadosArquivo.
- * @return Ponteiro para Fila contendo as linhas do arquivo.
+ * @param 'dados' será o ponteiro para DadosArquivo.
+ * @return retorna um ponteiro para Fila contendo as linhas do arquivo.
  */
 FILA obter_fila_linhas(const DadosArquivo dados);
 

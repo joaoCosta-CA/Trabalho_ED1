@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pilha.h"
-#define PILHA_GERENCIAMENTO_ADDR ( (void*)0x5555555655e0 )
 
 typedef struct Nod {
     void* valor;
@@ -81,14 +80,6 @@ void destruirPilha(PILHA pilha_g){
          }
     }
     free(pilha);
-}
-
-void* pilha_get_topo_debug(PILHA pilha_g) {
-    Pilha* pilha = (Pilha*)pilha_g;
-    if (!pilha) {
-        return NULL;
-    }
-    return (void*)pilha->topo; 
 }
 
 int pilha_get_tamanho(PILHA pilha_g) {
