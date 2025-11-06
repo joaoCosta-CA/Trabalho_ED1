@@ -4,7 +4,7 @@ João Henrique Batista da Costa 202500560669
 
 > **Trabalho I de Estrutura de Dados I - UEL**
 
-Um simulador de "Bocha Geométrica" desenvolvido em C99, modularizado com Tipos Abstratos de Dados (TADs). O programa lê arquivos de definição de mundo (`.geo`) e arquivos de comandos de jogo (`.qry`), processa interações físicas como disparos e colisões, e gera visualizações em SVG.
+#### Um simulador de "Bocha Geométrica" desenvolvido em C99, modularizado com Tipos Abstratos de Dados (TADs). O programa lê arquivos de definição de mundo (`.geo`) e arquivos de comandos de jogo (`.qry`), processa interações físicas como disparos e colisões, e gera visualizações em SVG.
 
 ---
 
