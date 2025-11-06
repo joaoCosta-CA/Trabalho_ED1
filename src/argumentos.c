@@ -12,3 +12,39 @@ char *get_option_value(int argc, char *argv[], char *opt_name) {
     }
     return NULL;
 }
+
+char *get_command_suffix(int argc, char *argv[]) {
+    char **argv_copy = malloc(argc * sizeof(char *));
+    if (argv_copy == NULL)
+      return NULL;
+  
+    for (int i = 0; i < argc; i++) {
+      argv_copy[i] = argv[i];
+    }
+  
+    int new_argc = argc;
+  
+    for (int i = 1; i < new_argc - 1; i++) {
+      if (argv_copy[i][0] == '-') {
+        if (argv_copy[i + 1][0] != '-') {
+          for (int j = i; j < new_argc - 2; j++) {
+            argv_copy[j] = argv_copy[j + 2];
+          }
+          new_argc -= 2;
+          i--; 
+        }
+      }
+    }
+  
+    char *suffix = NULL;
+    if (new_argc == 2) {
+      suffix = argv_copy[new_argc - 1];
+    } else if (new_argc > 2) {
+      printf("Erro: Mais de um sufixo\n");
+      free(argv_copy);
+      exit(1);
+    }
+  
+    free(argv_copy);
+    return suffix;
+  }
