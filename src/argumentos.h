@@ -27,4 +27,6 @@
  * @return retorna um ponteiro para a string do valor associado à opção ou NULL caso a opção não seja encontrada ou não tenha um valor associado
  */
 char *get_command_suffix(int argc, char *argv[]);
+
+int diretorio_valido(const char *caminho);
 #endif

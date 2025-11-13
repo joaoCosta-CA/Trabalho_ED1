@@ -35,6 +35,12 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    if (!diretorio_valido(output_path)) {
+        printf("Erro: O diretório de saída '%s' não existe ou não é válido.\n", output_path);
+        printf("Por favor, crie o diretório antes de executar o programa.\n");
+        exit(EXIT_FAILURE);
+    }
+
     char geo_full_path[MAX_FULL_PATH];
     char qry_full_path[MAX_FULL_PATH];
 
