@@ -42,6 +42,7 @@ static void tratar_comando_estilo_texto(ProcessadorDeFormas *processador);
 
 
 Chao processar_arquivo_geo(DadosArquivo dados_arquivo, const char *caminho_saida, const char *sufixo_comando) {
+    int cont = 0;
     ProcessadorDeFormas *processador = malloc(sizeof(ProcessadorDeFormas));
     if (!processador) {
         perror("Erro: Falha ao alocar memória para o ProcessadorDeFormas");
@@ -59,9 +60,12 @@ Chao processar_arquivo_geo(DadosArquivo dados_arquivo, const char *caminho_saida
         char *comando = strtok(linha, " \t\r\n");
         if (comando && comando[0] != '\0') {
             despachar_comando(comando, processador);
+            cont++;
         }
         free(linha);
     }
+
+    fprintf(stderr, "[DEBUG] Total de formas/comandos lidos do .geo: %d\n", cont);
 
     const char *nome_base = obter_nome_arquivo(dados_arquivo);
     char nome_arquivo_sem_ext[256];

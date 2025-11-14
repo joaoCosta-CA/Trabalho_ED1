@@ -43,7 +43,7 @@ Circulo CriarCirc(int id, float x, float y, double r, const char* corb, const ch
 void DestruirCirc(Circulo c_g){
     circulo* c = (circulo*)c_g;
     if(c != NULL){
-        free(c);
+        //free(c);
     }
     return;
 }

@@ -44,7 +44,7 @@ Linha criarLinha(int id, float x1, float y1, float x2, float y2, const char* cor
 void destruirLinha(Linha l_g){
     linha* l = (linha*)l_g;
     if(l != NULL){
-        free(l);
+        //free(l);
     }
 }
 

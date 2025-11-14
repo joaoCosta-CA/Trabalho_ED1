@@ -56,7 +56,7 @@ float area_texto(const Texto t) {
 void destruirTexto(Texto t) {
     Texto* texto = (Texto*)t;               
     if(texto != NULL){
-        free(texto);
+        //free(texto);
     }
 
 }

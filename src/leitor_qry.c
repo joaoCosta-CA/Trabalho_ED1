@@ -475,6 +475,7 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
     }
 
     destruirFila(fila_retorno);
+    destruirFila(fila_clones);
 
     *pontuacao_total += area_esmagada_round;
     fprintf(log_txt, "Fim do round. Area total esmagada no round: %.2f. Area total acumulada: %.2f\n", area_esmagada_round, *pontuacao_total);
