@@ -473,6 +473,33 @@ void svg_desenhar_chao(FILE* arquivo_svg, Chao chao) {
     iterador_destruir(it);
 }
 
+void svg_desenhar_fila(FILE* arquivo_svg, FILA fila) {
+    if (!arquivo_svg || !fila) return;
+
+    // Use stack to reverse drawing order
+    PILHA pilha_temp = criarPilha();
+    if (!pilha_temp) return;
+
+    IteradorFila it = fila_obter_iterador(fila);
+    while (iterador_tem_proximo(it)) {
+        FormaGeometricaStruct *forma = (FormaGeometricaStruct *)iterador_obter_proximo(it);
+        if (forma) {
+            push(pilha_temp, forma);
+        }
+    }
+    iterador_destruir(it);
+
+    while (!pilha_vazia(pilha_temp)) {
+        FormaGeometricaStruct *forma = (FormaGeometricaStruct *)pop(pilha_temp);
+        if (forma && (forma->tipo == CIRCULO || forma->tipo == RETANGULO || forma->tipo == LINHA || forma->tipo == TEXTO)) {
+            desenhar_forma_svg(arquivo_svg, forma);
+        }
+    }
+
+    destruirPilha(pilha_temp);
+}
+
+
 void svg_finalizar(FILE* arquivo_svg) {
     if (arquivo_svg) {
         fprintf(arquivo_svg, "</svg>\n");

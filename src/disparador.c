@@ -141,15 +141,26 @@ int rajada_de_disparos(Disp disp, char lado, double dx, double dy, double ix, do
     Carregador carga_alvo = (lado == 'd') ? d->carga_dir : d->carga_esq;
     if (carga_alvo == NULL) return 0;
 
-    int disparos_executados = 0;
-    while (!carregador_esta_vazio(carga_alvo)) {
+    // Collect all form pointers into array (LIFO order from stack)
+    const int MAX_DISPAROS = 100;
+    FormaGeometrica* formas[MAX_DISPAROS];
+    int count = 0;
+    
+    while (!carregador_esta_vazio(carga_alvo) && count < MAX_DISPAROS) {
         shift_carga(disp, lado, 1);
+        formas[count++] = d->em_disparo;
+    }
+    
+    // REVERSE to get smallest first with smallest Y
+    int disparos_executados = 0;
+    for (int i = count - 1; i >= 0; i--) {
+        d->em_disparo = formas[i];
         disparar_forma(disp, dx, dy, arena);
         dx += ix;
         dy += iy;
         disparos_executados++;
     }
-
+    
     return disparos_executados;
 }
 int disparador_get_id(Disp disp) {

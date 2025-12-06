@@ -37,7 +37,7 @@ static void tratar_comando_lc(char* params, Chao chao, Carregador** array_carreg
 static void tratar_comando_atch(char* params, Disp* array_disparadores, int num_disparadores, Carregador* array_carregadores, int num_carregadores);
 static void tratar_comando_shft(char* params, Disp* array_disparadores, int num_disparadores, FILE* log_txt);
 static void tratar_comando_dsp(char* params, Disp* array_disparadores, int num_disparadores, FILA arena, int* contador_disparos, AnotacaoDisparo** array_anotacoes, int* num_anotacoes, FILE* log_txt);
-static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_disparadores, FILA arena, int* contador_disparos, FILE* log_txt);
+static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_disparadores, FILA arena, int* contador_disparos, Chao chao, double* pontuacao_total, int* total_esmagados, int* total_clonados, AnotacaoEsmagamento** array_anotacoes_esmag, int* num_anotacoes_esmag, int* proximo_id_clone, FILE* log_txt);
 static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,int* contador_esmagados, int* contador_clonados,AnotacaoEsmagamento** array_anotacoes_esmag, int* num_anotacoes_esmag,int* proximo_id_clone,FILE* log_txt);
 
 // Funções auxiliares
@@ -75,6 +75,7 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
     int num_anotacoes_esmag = 0;
 
     FILA arena_de_combate = criarFila();
+    FILA arena_snapshot = NULL;  // Snapshot da arena antes do calc
 
     int proximo_id_clone = leitor_geo_get_max_id(chao) + 1;
     
@@ -137,8 +138,17 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
             } else if (strcmp(comando, "dsp") == 0) {
                 tratar_comando_dsp(parametros, array_disparadores, num_disparadores, arena_de_combate, &total_disparos, &array_anotacoes_disparo, &num_anotacoes_disparo, arquivo_log_txt);
             } else if (strcmp(comando, "rjd") == 0) {
-                tratar_comando_rjd(parametros, array_disparadores, num_disparadores, arena_de_combate, &total_disparos, arquivo_log_txt);
+                tratar_comando_rjd(parametros, array_disparadores, num_disparadores, arena_de_combate, &total_disparos, chao, &pontuacao_total, &total_esmagados, &total_clonados, &array_anotacoes_esmag, &num_anotacoes_esmag, &proximo_id_clone, arquivo_log_txt);
             } else if (strcmp(comando, "calc") == 0) {
+                // Criar snapshot da arena antes do calc para visualização no SVG
+                if (arena_snapshot == NULL && !fila_vazia(arena_de_combate)) {
+                    arena_snapshot = criarFila();
+                    IteradorFila it = fila_obter_iterador(arena_de_combate);
+                    while (iterador_tem_proximo(it)) {
+                        insertFila(arena_snapshot, iterador_obter_proximo(it));
+                    }
+                    iterador_destruir(it);
+                }
                 tratar_comando_calc(arena_de_combate, chao, &pontuacao_total, &total_esmagados, &total_clonados, &array_anotacoes_esmag, &num_anotacoes_esmag, &proximo_id_clone, arquivo_log_txt);
             }
         }
@@ -149,6 +159,9 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
     snprintf(caminho_final_svg, sizeof(caminho_final_svg), "%s/%s-%s.svg", caminho_saida, nome_geo_sem_ext, nome_qry_sem_ext);
     FILE* svg = svg_iniciar(caminho_final_svg);
     if (svg) {
+        // Desenha o chão que inclui:
+        // 1. Formas que não foram disparadas
+        // 2. Formas que sobreviveram ao calc e voltaram
         svg_desenhar_chao(svg, chao);
 
     for (int i = 0; i < num_anotacoes_esmag; i++) {
@@ -158,6 +171,7 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
 
         svg_finalizar(svg);
     }
+
 
     if(arquivo_log_txt) {
         fprintf(arquivo_log_txt, "\n--- ESTATÍSTICAS ---\n");
@@ -181,6 +195,9 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
     free(array_anotacoes_disparo);
     free(array_anotacoes_esmag);
     destruirFila(arena_de_combate);
+    if (arena_snapshot != NULL) {
+        destruirFila(arena_snapshot);
+    }
 }
 
 static Disp buscar_disparador_por_id(int id, Disp* array, int tamanho) {
@@ -269,15 +286,27 @@ static void tratar_comando_lc(char* params, Chao chao, Carregador** array_carreg
     }
     (*array_carregadores)[(*num_carregadores) - 1] = novo_carregador;
 
+    // Usar pilha temporária para inverter ordem
+    PILHA pilha_temp = criarPilha();
+    if (!pilha_temp) return;
+    
     FILA fila_do_chao = leitor_geo_get_fila_principal(chao);
     for (int i = 0; i < n_formas && !fila_vazia(fila_do_chao); ++i) {
         FormaGeometrica forma = removeFila(fila_do_chao);
+        push(pilha_temp, forma);
+    }
+    
+    // Agora desempilhar e colocar no carregador (ordem reversa)
+    while (!pilha_vazia(pilha_temp)) {
+        FormaGeometrica forma = pop(pilha_temp);
         carregador_municia_forma(novo_carregador, forma);
         if (log_txt) {
             fprintf(log_txt, "\t-> ");
             imprimir_dados_forma(log_txt, forma);
         }
     }
+    
+    destruirPilha(pilha_temp);
 }
 
 static void tratar_comando_atch(char* params, Disp* array_disparadores, int num_disparadores, Carregador* array_carregadores, int num_carregadores) {
@@ -285,10 +314,18 @@ static void tratar_comando_atch(char* params, Disp* array_disparadores, int num_
     sscanf(params, "%d %d %d", &id_disp, &id_esq, &id_dir);
 
     Disp d = buscar_disparador_por_id(id_disp, array_disparadores, num_disparadores);
+    if (!d) return;
+    
     Carregador c_esq = buscar_carregador_por_id(id_esq, array_carregadores, num_carregadores);
     Carregador c_dir = buscar_carregador_por_id(id_dir, array_carregadores, num_carregadores);
-
-    if (d && c_esq && c_dir) {
+    
+    // Se ambos existem, anexar normalmente
+    // Se só um existe, anexar o mesmo em AMBOS os lados
+    if (c_esq && !c_dir) {
+        anexar_carregadores(d, c_esq, c_esq);
+    } else if (!c_esq && c_dir) {
+        anexar_carregadores(d, c_dir, c_dir);
+    } else {
         anexar_carregadores(d, c_esq, c_dir);
     }
 }
@@ -352,20 +389,124 @@ static void tratar_comando_dsp(char* params, Disp* array_disparadores, int num_d
     }
 }
 
-static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_disparadores, FILA arena, int* contador_disparos, FILE* log_txt) {
-    int id_disp, disparos_efetuados = 0;
+static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_disparadores, FILA arena, int* contador_disparos, Chao chao, double* pontuacao_total, int* total_esmagados, int* total_clonados, AnotacaoEsmagamento** array_anotacoes_esmag, int* num_anotacoes_esmag, int* proximo_id_clone, FILE* log_txt) {
+    int id_disp;
     char lado;
     double dx, dy, ix, iy;
     sscanf(params, "%d %c %lf %lf %lf %lf", &id_disp, &lado, &dx, &dy, &ix, &iy);
 
     Disp d = buscar_disparador_por_id(id_disp, array_disparadores, num_disparadores);
-    if (d) {
-        disparos_efetuados = rajada_de_disparos(d, lado, dx, dy, ix, iy, arena);
-        (*contador_disparos) += disparos_efetuados;
-        
-        if (log_txt) {
-            fprintf(log_txt, "Rajada de disparos executada. Figuras movidas para a arena.\n");
+    if (!d) return;
+
+    // Acessar estrutura interna do disparador
+    typedef struct {
+        int id;
+        double x;
+        double y;
+        Carregador carga_esq;
+        Carregador carga_dir;
+        FormaGeometrica* em_disparo;
+    } DisparadorStruct;
+    
+    DisparadorStruct* disp_struct = (DisparadorStruct*)d;
+    Carregador carga_alvo = (lado == 'd' || lado == 'D') ? disp_struct->carga_dir : disp_struct->carga_esq;
+    if (!carga_alvo) return;
+
+    // Primeiro, coletar TODAS as formas do carregador em um array
+    const int MAX_DISPAROS = 100;
+    FormaGeometrica* formas_array[MAX_DISPAROS];
+    int total_formas = 0;
+    
+    while (!carregador_esta_vazio(carga_alvo) && total_formas < MAX_DISPAROS) {
+        shift_carga(d, lado, 1);
+        formas_array[total_formas++] = disp_struct->em_disparo;
+    }
+    
+    // Processar em ordem REVERSA (menores primeiro)
+    double dx_atual = dx;
+    double dy_atual = dy;
+    int disparos_efetuados = 0;
+    FILA fila_chao = leitor_geo_get_fila_principal(chao);
+    
+    for (int idx = total_formas - 1; idx >= 0; idx -= 2) {
+        if (idx < 1) {
+            // Última forma ímpar
+            disp_struct->em_disparo = formas_array[idx];
+            disparar_forma(d, dx_atual, dy_atual, arena);
+            (*contador_disparos)++;
+            FormaGeometrica ultima = removeFila(arena);
+            insertFila(fila_chao, ultima);
+            break;
         }
+        
+        // Disparar PAR (I e J)
+        disp_struct->em_disparo = formas_array[idx-1];  // I (menor do par)
+        disparar_forma(d, dx_atual, dy_atual, arena);
+        (*contador_disparos)++;
+        dx_atual += ix;
+        dy_atual += iy;
+        
+        disp_struct->em_disparo = formas_array[idx];  // J (maior do par)
+        disparar_forma(d, dx_atual, dy_atual, arena);
+        (*contador_disparos)++;
+        
+        // Processar PAR
+        FormaGeometrica forma_j = removeFila(arena);
+        FormaGeometrica forma_i = removeFila(arena);
+        
+        bool sobrepoe = formas_se_sobrepoem(forma_i, forma_j);
+        
+        if (sobrepoe) {
+            double area_i = forma_get_area(forma_i);
+            double area_j = forma_get_area(forma_j);
+            
+            if (area_i < area_j) {
+                *pontuacao_total += area_i;
+                (*total_esmagados)++;
+                fprintf(log_txt, "SOBREPOSICAO (RJD PAR): Forma I id:%d (area %.2f) esmagada pela Forma J id:%d (area %.2f).\n",
+                    forma_get_id(forma_i), area_i, forma_get_id(forma_j), area_j);
+                
+                double x_esmag = forma_get_x(forma_i);
+                double y_esmag = forma_get_y(forma_i);
+                (*num_anotacoes_esmag)++;
+                *array_anotacoes_esmag = realloc(*array_anotacoes_esmag, (*num_anotacoes_esmag) * sizeof(AnotacaoEsmagamento));
+                AnotacaoEsmagamento* nova_anot = &((*array_anotacoes_esmag)[(*num_anotacoes_esmag) - 1]);
+                nova_anot->x = x_esmag;
+                nova_anot->y = y_esmag;
+                
+                destruir_forma_completa(forma_i);
+                insertFila(fila_chao, forma_j);
+            } else {
+                fprintf(log_txt, "SOBREPOSICAO (RJD PAR): Forma I id:%d altera Forma J id:%d e eh clonada.\n",
+                    forma_get_id(forma_i), forma_get_id(forma_j));
+                
+                const char* cor_i = forma_get_cor_preenchimento(forma_i);
+                if (cor_i) forma_set_cor_borda(forma_j, cor_i);
+                
+                FormaGeometrica clone_i = forma_clonar(forma_i, proximo_id_clone);
+                if (clone_i) {
+                    insertFila(fila_chao, clone_i);
+                    PILHA pilha_gestao = leitor_geo_get_pilha_gestao(chao);
+                    push(pilha_gestao, clone_i);
+                    (*total_clonados)++;
+                }
+                destruir_forma_completa(forma_i);
+                insertFila(fila_chao, forma_j);
+            }
+        } else {
+            fprintf(log_txt, "SEM SOBREPOSICAO (RJD PAR): Formas id:%d e id:%d retornam ao chao.\n",
+                forma_get_id(forma_i), forma_get_id(forma_j));
+            insertFila(fila_chao, forma_i);
+            insertFila(fila_chao, forma_j);
+        }
+        
+        dx_atual += ix;
+        dy_atual += iy;
+        disparos_efetuados += 2;
+    }
+    
+    if (log_txt) {
+        fprintf(log_txt, "Rajada de disparos executada. %d formas disparadas em pares.\n", disparos_efetuados);
     }
 }
 

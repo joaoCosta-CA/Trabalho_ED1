@@ -94,6 +94,15 @@ void svg_desenhar_chao(FILE* arquivo_svg, Chao chao);
 void svg_finalizar(FILE* arquivo_svg);
 
 /**
+ * @brief função que desenha todas as formas contidas em uma FILA em um arquivo SVG já aberto.
+ * 
+ * @param 'arquivo_svg' será o ponteiro do arquivo retornado por svg_iniciar.
+ * @param 'fila' será a FILA contendo as formas a serem desenhadas.
+ */
+void svg_desenhar_fila(FILE* arquivo_svg, FILA fila);
+
+
+/**
  * @brief função que obtém o identificador associado a uma forma geométrica.
  *
  * Retorna o ID que identifica a forma passada como argumento. O ID é
