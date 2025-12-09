@@ -155,6 +155,7 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
         free(linha);
     }
 
+
     char caminho_final_svg[1024];
     snprintf(caminho_final_svg, sizeof(caminho_final_svg), "%s/%s-%s.svg", caminho_saida, nome_geo_sem_ext, nome_qry_sem_ext);
     FILE* svg = svg_iniciar(caminho_final_svg);
@@ -162,6 +163,7 @@ void processar_arquivo_qry(Chao chao, DadosArquivo dados_qry, DadosArquivo dados
         // Desenha o chão que inclui:
         // 1. Formas que não foram disparadas
         // 2. Formas que sobreviveram ao calc e voltaram
+        // 3. Formas que ficaram nos carregadores
         svg_desenhar_chao(svg, chao);
 
     for (int i = 0; i < num_anotacoes_esmag; i++) {
@@ -287,8 +289,10 @@ static void tratar_comando_lc(char* params, Chao chao, Carregador** array_carreg
     (*array_carregadores)[(*num_carregadores) - 1] = novo_carregador;
 
     // Usar pilha temporária para inverter ordem
+    // Formas do .geo: 1,2,3,4 -> pilha_temp: topo=4,fundo=1
+    // Desempilhar para carregador: carregador topo=1, fundo=4
+    // Ao retirar do carregador: sai 1,2,3,4 (ordem original do .geo!)
     PILHA pilha_temp = criarPilha();
-    if (!pilha_temp) return;
     
     FILA fila_do_chao = leitor_geo_get_fila_principal(chao);
     for (int i = 0; i < n_formas && !fila_vazia(fila_do_chao); ++i) {
@@ -296,7 +300,6 @@ static void tratar_comando_lc(char* params, Chao chao, Carregador** array_carreg
         push(pilha_temp, forma);
     }
     
-    // Agora desempilhar e colocar no carregador (ordem reversa)
     while (!pilha_vazia(pilha_temp)) {
         FormaGeometrica forma = pop(pilha_temp);
         carregador_municia_forma(novo_carregador, forma);
@@ -319,15 +322,7 @@ static void tratar_comando_atch(char* params, Disp* array_disparadores, int num_
     Carregador c_esq = buscar_carregador_por_id(id_esq, array_carregadores, num_carregadores);
     Carregador c_dir = buscar_carregador_por_id(id_dir, array_carregadores, num_carregadores);
     
-    // Se ambos existem, anexar normalmente
-    // Se só um existe, anexar o mesmo em AMBOS os lados
-    if (c_esq && !c_dir) {
-        anexar_carregadores(d, c_esq, c_esq);
-    } else if (!c_esq && c_dir) {
-        anexar_carregadores(d, c_dir, c_dir);
-    } else {
-        anexar_carregadores(d, c_esq, c_dir);
-    }
+    anexar_carregadores(d, c_esq, c_dir);
 }
 
 static void tratar_comando_shft(char* params, Disp* array_disparadores, int num_disparadores, FILE* log_txt) {
@@ -409,27 +404,47 @@ static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_d
     } DisparadorStruct;
     
     DisparadorStruct* disp_struct = (DisparadorStruct*)d;
+    
+    // Selecionar carregador alvo com fallback
     Carregador carga_alvo = (lado == 'd' || lado == 'D') ? disp_struct->carga_dir : disp_struct->carga_esq;
-    if (!carga_alvo) return;
+    char lado_usado = lado;
+    
+    // Se carregador selecionado está vazio ou NULL, tentar o outro
+    if (!carga_alvo || carregador_esta_vazio(carga_alvo)) {
+        Carregador outro = (lado == 'd' || lado == 'D') ? disp_struct->carga_esq : disp_struct->carga_dir;
+        if (outro && !carregador_esta_vazio(outro)) {
+            carga_alvo = outro;
+            lado_usado = (lado == 'd' || lado == 'D') ? 'e' : 'd';
+        } else {
+            return; // Ambos carregadores vazios ou NULL
+        }
+    }
+
 
     // Primeiro, coletar TODAS as formas do carregador em um array
+    // Usar carregador_retira_forma diretamente para não acionar a lógica de devolução do shift
     const int MAX_DISPAROS = 100;
-    FormaGeometrica* formas_array[MAX_DISPAROS];
+    FormaGeometrica formas_array[MAX_DISPAROS];
     int total_formas = 0;
     
     while (!carregador_esta_vazio(carga_alvo) && total_formas < MAX_DISPAROS) {
-        shift_carga(d, lado, 1);
-        formas_array[total_formas++] = disp_struct->em_disparo;
+        FormaGeometrica forma = carregador_retira_forma(carga_alvo);
+        if (forma) {
+            formas_array[total_formas++] = forma;
+        }
     }
     
-    // Processar em ordem REVERSA (menores primeiro)
+    // Os carregadores já estão invertidos pelo atch, então as formas vêm na ordem correta
+    // (menores primeiro)
+    
+    // Processar em ordem normal (menores primeiro)
     double dx_atual = dx;
     double dy_atual = dy;
     int disparos_efetuados = 0;
     FILA fila_chao = leitor_geo_get_fila_principal(chao);
     
-    for (int idx = total_formas - 1; idx >= 0; idx -= 2) {
-        if (idx < 1) {
+    for (int idx = 0; idx < total_formas; idx += 2) {
+        if (idx + 1 >= total_formas) {
             // Última forma ímpar
             disp_struct->em_disparo = formas_array[idx];
             disparar_forma(d, dx_atual, dy_atual, arena);
@@ -440,64 +455,58 @@ static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_d
         }
         
         // Disparar PAR (I e J)
-        disp_struct->em_disparo = formas_array[idx-1];  // I (menor do par)
+        disp_struct->em_disparo = formas_array[idx];  // I (menor do par)
         disparar_forma(d, dx_atual, dy_atual, arena);
         (*contador_disparos)++;
         dx_atual += ix;
         dy_atual += iy;
         
-        disp_struct->em_disparo = formas_array[idx];  // J (maior do par)
+        disp_struct->em_disparo = formas_array[idx+1];  // J (maior do par)
         disparar_forma(d, dx_atual, dy_atual, arena);
         (*contador_disparos)++;
         
-        // Processar PAR
+        // Processar PAR - no rjd, I e J do mesmo par SEMPRE se sobrepõem
         FormaGeometrica forma_j = removeFila(arena);
         FormaGeometrica forma_i = removeFila(arena);
         
-        bool sobrepoe = formas_se_sobrepoem(forma_i, forma_j);
+        // Comparar áreas: maior esmaga menor
+        double area_i = forma_get_area(forma_i);
+        double area_j = forma_get_area(forma_j);
         
-        if (sobrepoe) {
-            double area_i = forma_get_area(forma_i);
-            double area_j = forma_get_area(forma_j);
+        if (area_i < area_j) {
+            // J (maior) esmaga I (menor)
+            *pontuacao_total += area_i;
+            (*total_esmagados)++;
+            fprintf(log_txt, "SOBREPOSICAO (RJD PAR): Forma I id:%d (area %.2f) esmagada pela Forma J id:%d (area %.2f).\n",
+                forma_get_id(forma_i), area_i, forma_get_id(forma_j), area_j);
             
-            if (area_i < area_j) {
-                *pontuacao_total += area_i;
-                (*total_esmagados)++;
-                fprintf(log_txt, "SOBREPOSICAO (RJD PAR): Forma I id:%d (area %.2f) esmagada pela Forma J id:%d (area %.2f).\n",
-                    forma_get_id(forma_i), area_i, forma_get_id(forma_j), area_j);
-                
-                double x_esmag = forma_get_x(forma_i);
-                double y_esmag = forma_get_y(forma_i);
-                (*num_anotacoes_esmag)++;
-                *array_anotacoes_esmag = realloc(*array_anotacoes_esmag, (*num_anotacoes_esmag) * sizeof(AnotacaoEsmagamento));
-                AnotacaoEsmagamento* nova_anot = &((*array_anotacoes_esmag)[(*num_anotacoes_esmag) - 1]);
-                nova_anot->x = x_esmag;
-                nova_anot->y = y_esmag;
-                
-                destruir_forma_completa(forma_i);
-                insertFila(fila_chao, forma_j);
-            } else {
-                fprintf(log_txt, "SOBREPOSICAO (RJD PAR): Forma I id:%d altera Forma J id:%d e eh clonada.\n",
-                    forma_get_id(forma_i), forma_get_id(forma_j));
-                
-                const char* cor_i = forma_get_cor_preenchimento(forma_i);
-                if (cor_i) forma_set_cor_borda(forma_j, cor_i);
-                
-                FormaGeometrica clone_i = forma_clonar(forma_i, proximo_id_clone);
-                if (clone_i) {
-                    insertFila(fila_chao, clone_i);
-                    PILHA pilha_gestao = leitor_geo_get_pilha_gestao(chao);
-                    push(pilha_gestao, clone_i);
-                    (*total_clonados)++;
-                }
-                destruir_forma_completa(forma_i);
-                insertFila(fila_chao, forma_j);
-            }
-        } else {
-            fprintf(log_txt, "SEM SOBREPOSICAO (RJD PAR): Formas id:%d e id:%d retornam ao chao.\n",
-                forma_get_id(forma_i), forma_get_id(forma_j));
-            insertFila(fila_chao, forma_i);
+            double x_esmag = forma_get_x(forma_i);
+            double y_esmag = forma_get_y(forma_i);
+            (*num_anotacoes_esmag)++;
+            *array_anotacoes_esmag = realloc(*array_anotacoes_esmag, (*num_anotacoes_esmag) * sizeof(AnotacaoEsmagamento));
+            AnotacaoEsmagamento* nova_anot = &((*array_anotacoes_esmag)[(*num_anotacoes_esmag) - 1]);
+            nova_anot->x = x_esmag;
+            nova_anot->y = y_esmag;
+            
+            destruir_forma_completa(forma_i);
             insertFila(fila_chao, forma_j);
+        } else {
+            // I >= J: I (maior) esmaga J (menor)
+            *pontuacao_total += area_j;
+            (*total_esmagados)++;
+            fprintf(log_txt, "SOBREPOSICAO (RJD PAR): Forma J id:%d (area %.2f) esmagada pela Forma I id:%d (area %.2f).\n",
+                forma_get_id(forma_j), area_j, forma_get_id(forma_i), area_i);
+            
+            double x_esmag = forma_get_x(forma_j);
+            double y_esmag = forma_get_y(forma_j);
+            (*num_anotacoes_esmag)++;
+            *array_anotacoes_esmag = realloc(*array_anotacoes_esmag, (*num_anotacoes_esmag) * sizeof(AnotacaoEsmagamento));
+            AnotacaoEsmagamento* nova_anot = &((*array_anotacoes_esmag)[(*num_anotacoes_esmag) - 1]);
+            nova_anot->x = x_esmag;
+            nova_anot->y = y_esmag;
+            
+            destruir_forma_completa(forma_j);
+            insertFila(fila_chao, forma_i);
         }
         
         dx_atual += ix;
@@ -524,95 +533,93 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
     FILA fila_clones = criarFila();
 
     if (fila_vazia(arena)) {
-        fprintf(log_txt, "Arena vazia. Nada a processar.\n");
+        fprintf(log_txt, "Processamento das formas concluído.\n");
         destruirFila(fila_retorno);
         destruirFila(fila_clones);
         return;
     }
 
-    // Processa pares consecutivos de formas da arena
-    FormaGeometrica forma_i = removeFila(arena);
-
-    while (!fila_vazia(arena)) {
-        FormaGeometrica forma_j = removeFila(arena);
-
+    // Converter arena para array para processar pares (i, i+1)
+    const int MAX_FORMAS = 100;
+    FormaGeometrica formas[MAX_FORMAS];
+    bool esmagada[MAX_FORMAS];
+    int n = 0;
+    
+    while (!fila_vazia(arena) && n < MAX_FORMAS) {
+        formas[n] = removeFila(arena);
+        esmagada[n] = false;
+        n++;
+    }
+    
+    // Processar pares consecutivos (0,1), (2,3), (4,5), etc.
+    for (int i = 0; i + 1 < n; i += 2) {
+        FormaGeometrica forma_i = formas[i];
+        FormaGeometrica forma_j = formas[i + 1];
+        
         bool sobrepoe = formas_se_sobrepoem(forma_i, forma_j);
-
+        
         if (sobrepoe) {
-            // Formas se sobrepõem: verificar qual tem área maior
             double area_i = forma_get_area(forma_i);
             double area_j = forma_get_area(forma_j);
-
+            
             if (area_i < area_j) {
-                // Forma I é menor: esmagada e destruída
+                // Forma I é menor: esmagada
                 area_esmagada_round += area_i;
                 (*contador_esmagados)++;
-                fprintf(log_txt, "SOBREPOSICAO: Forma I (id %d, area %.2f) esmagada pela Forma J (id %d, area %.2f).\n", forma_get_id(forma_i), area_i, forma_get_id(forma_j), area_j);
-
-                // Registrar posição do esmagamento
+                fprintf(log_txt, "SOBREPOSICAO: Forma I (id %d, area %.2f) esmagada pela Forma J (id %d, area %.2f).\n",
+                    forma_get_id(forma_i), area_i, forma_get_id(forma_j), area_j);
+                
                 double x_esmag = forma_get_x(forma_i);
                 double y_esmag = forma_get_y(forma_i);
-
                 (*num_anotacoes_esmag)++;
                 *array_anotacoes_esmag = realloc(*array_anotacoes_esmag, (*num_anotacoes_esmag) * sizeof(AnotacaoEsmagamento));
                 AnotacaoEsmagamento* nova_anot = &((*array_anotacoes_esmag)[(*num_anotacoes_esmag) - 1]);
                 nova_anot->x = x_esmag;
                 nova_anot->y = y_esmag;
-
+                
+                esmagada[i] = true;
                 destruir_forma_completa(forma_i);
-                forma_i = forma_j;
-
+                formas[i] = NULL;
+                
             } else {
-                // Forma I é maior ou igual: clona e altera cor da forma J
-                fprintf(log_txt, "SOBREPOSICAO: Forma I (id %d) altera Forma J (id %d) e eh clonada.\n", forma_get_id(forma_i), forma_get_id(forma_j));
-
-                // Aplica cor de preenchimento da forma I na borda da forma J
-                const char* cor_preenchimento_i = forma_get_cor_preenchimento(forma_i);
-                if (cor_preenchimento_i) {
-                   forma_set_cor_borda(forma_j, cor_preenchimento_i);
-                }
-
-                // Clona forma I e adiciona à pilha de gerenciamento
+                // Forma I >= J: I altera J e é clonada
+                fprintf(log_txt, "SOBREPOSICAO: Forma I (id %d) altera Forma J (id %d) e eh clonada.\n",
+                    forma_get_id(forma_i), forma_get_id(forma_j));
+                
+                const char* cor_i = forma_get_cor_preenchimento(forma_i);
+                if (cor_i) forma_set_cor_borda(forma_j, cor_i);
+                
                 FormaGeometrica clone_i = forma_clonar(forma_i, proximo_id_clone);
                 if (clone_i) {
                     insertFila(fila_clones, clone_i);
                     PILHA pilha_gestao = leitor_geo_get_pilha_gestao(chao);
                     push(pilha_gestao, clone_i);
-                     (*contador_clonados)++;
-                } else {
-                     fprintf(stderr, "Erro ao clonar forma ID %d\n", forma_get_id(forma_i));
+                    (*contador_clonados)++;
                 }
-
-                insertFila(fila_retorno, forma_i);
-                forma_i = forma_j;
             }
         } else {
-            // Formas não se sobrepõem: ambas retornam ao chão
-            fprintf(log_txt, "SEM SOBREPOSICAO: As formas com id %d e %d retornam ao chao.\n", forma_get_id(forma_i), forma_get_id(forma_j));
-            insertFila(fila_retorno, forma_i);
-            forma_i = forma_j;
+            fprintf(log_txt, "SEM SOBREPOSICAO: As formas com id %d e %d retornam ao chao.\n",
+                forma_get_id(forma_i), forma_get_id(forma_j));
         }
     }
-
-    // Adiciona última forma processada e todos os clones à fila de retorno
-    insertFila(fila_retorno, forma_i);
-
+    
+    // Retornar formas não esmagadas ao chão
+    for (int i = 0; i < n; i++) {
+        if (formas[i] != NULL) {
+            insertFila(fila_retorno, formas[i]);
+        }
+    }
+    
+    // Adicionar clones
     while (!fila_vazia(fila_clones)) {
         insertFila(fila_retorno, removeFila(fila_clones));
     }
 
-    // Retorna todas as formas processadas ao chão
+    // Retorna todas as formas ao chão
     FILA fila_do_chao = leitor_geo_get_fila_principal(chao);
-
     while (!fila_vazia(fila_retorno)) {
-
-        FormaGeometrica forma_a_retornar = removeFila(fila_retorno);
-        if (!forma_a_retornar) { 
-            fprintf(stderr, "ERRO: removeFila(fila_retorno) retornou NULL!\n"); 
-            break;
-        }
-
-        insertFila(fila_do_chao, forma_a_retornar);
+        FormaGeometrica forma = removeFila(fila_retorno);
+        if (forma) insertFila(fila_do_chao, forma);
     }
 
     destruirFila(fila_retorno);

@@ -1,5 +1,6 @@
 #include "carregador.h"
 #include "pilha.h"
+#include "fila.h"
 
 #include <stdlib.h>
 
@@ -73,4 +74,26 @@ int carregador_esta_vazio(Carregador carregador) {
     PILHA pilha_interna = c->pilha_formas;
 
     return pilha_vazia(pilha_interna);
+}
+
+// Inverte a ordem das formas no carregador (LIFO -> LIFO invertido)
+void carregador_inverter(Carregador carregador) {
+    if (carregador == NULL || carregador_esta_vazio(carregador)) {
+        return;
+    }
+    
+    CarregadorStruct* c = (CarregadorStruct*)carregador;
+    
+    // Esvaziar pilha para fila (mantém ordem de saída da pilha)
+    FILA fila_temp = criarFila();
+    while (!pilha_vazia(c->pilha_formas)) {
+        insertFila(fila_temp, pop(c->pilha_formas));
+    }
+    
+    // Reinserir no carregador a partir da fila
+    // Cada push coloca no topo, então a primeira da fila fica no fundo
+    while (!fila_vazia(fila_temp)) {
+        push(c->pilha_formas, removeFila(fila_temp));
+    }
+    destruirFila(fila_temp);
 }

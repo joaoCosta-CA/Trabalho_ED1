@@ -62,26 +62,34 @@ void shift_carga(Disp disp, char lado, int n) {
 
     for (int i = 0; i < n; i++) {
         FormaGeometrica nova_forma = NULL;
-
-        if (lado == 'd' && d->carga_dir != NULL) {
-            nova_forma = carregador_retira_forma(d->carga_dir); 
-            if (nova_forma == NULL) break;
-
-            if (d->em_disparo != NULL && d->carga_esq != NULL) {
-                carregador_municia_forma(d->carga_esq, d->em_disparo);
+        char lado_usado = lado;
+        
+        // Verificar se carregador especificado está vazio, tentar o oposto
+        if (lado_usado == 'd') {
+            if (d->carga_dir == NULL || carregador_esta_vazio(d->carga_dir)) {
+                if (d->carga_esq != NULL && !carregador_esta_vazio(d->carga_esq)) {
+                    lado_usado = 'e';
+                } else {
+                    break; // Ambos vazios
+                }
             }
-
-        } else if (lado == 'e' && d->carga_esq != NULL) {
-            nova_forma = carregador_retira_forma(d->carga_esq); 
-            if (nova_forma == NULL) break;
-
-            if (d->em_disparo != NULL && d->carga_dir != NULL) {
-                carregador_municia_forma(d->carga_dir, d->em_disparo);
+        } else if (lado_usado == 'e') {
+            if (d->carga_esq == NULL || carregador_esta_vazio(d->carga_esq)) {
+                if (d->carga_dir != NULL && !carregador_esta_vazio(d->carga_dir)) {
+                    lado_usado = 'd';
+                } else {
+                    break; // Ambos vazios
+                }
             }
-        } else {
-            break;
         }
 
+        if (lado_usado == 'd' && d->carga_dir != NULL) {
+            nova_forma = carregador_retira_forma(d->carga_dir);
+        } else if (lado_usado == 'e' && d->carga_esq != NULL) {
+            nova_forma = carregador_retira_forma(d->carga_esq);
+        }
+        
+        if (nova_forma == NULL) break;
         d->em_disparo = nova_forma;
     }
 }

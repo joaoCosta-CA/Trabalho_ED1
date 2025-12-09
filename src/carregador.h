@@ -85,4 +85,10 @@ int carregador_esta_vazio(Carregador c);
  */
 PILHA carregador_get_pilha(Carregador c);
 
+/**
+ * @brief Inverte a ordem das formas no carregador.
+ * @param 'c' será o carregador cujas formas serão invertidas.
+ */
+void carregador_inverter(Carregador c);
+
 #endif
