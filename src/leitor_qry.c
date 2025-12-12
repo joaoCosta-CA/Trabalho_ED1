@@ -384,7 +384,7 @@ static void tratar_comando_dsp(char* params, Disp* array_disparadores, int num_d
     }
 }
 
-static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_disparadores, FILA arena, int* contador_disparos, Chao chao, double* pontuacao_total, int* total_esmagados, int* total_clonados, AnotacaoEsmagamento** array_anotacoes_esmag, int* num_anotacoes_esmag, int* proximo_id_clone, FILE* log_txt) {
+static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_disparadores, FILA arena, int* contador_disparos, Chao chao, double* pontuacao_total, int* total_esmagados, int* total_clonados __attribute__((unused)), AnotacaoEsmagamento** array_anotacoes_esmag, int* num_anotacoes_esmag, int* proximo_id_clone __attribute__((unused)), FILE* log_txt) {
     int id_disp;
     char lado;
     double dx, dy, ix, iy;
@@ -407,14 +407,12 @@ static void tratar_comando_rjd(char* params, Disp* array_disparadores, int num_d
     
     // Selecionar carregador alvo com fallback
     Carregador carga_alvo = (lado == 'd' || lado == 'D') ? disp_struct->carga_dir : disp_struct->carga_esq;
-    char lado_usado = lado;
     
     // Se carregador selecionado está vazio ou NULL, tentar o outro
     if (!carga_alvo || carregador_esta_vazio(carga_alvo)) {
         Carregador outro = (lado == 'd' || lado == 'D') ? disp_struct->carga_esq : disp_struct->carga_dir;
         if (outro && !carregador_esta_vazio(outro)) {
             carga_alvo = outro;
-            lado_usado = (lado == 'd' || lado == 'D') ? 'e' : 'd';
         } else {
             return; // Ambos carregadores vazios ou NULL
         }
@@ -542,12 +540,10 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
     // Converter arena para array para processar pares (i, i+1)
     const int MAX_FORMAS = 100;
     FormaGeometrica formas[MAX_FORMAS];
-    bool esmagada[MAX_FORMAS];
     int n = 0;
     
     while (!fila_vazia(arena) && n < MAX_FORMAS) {
         formas[n] = removeFila(arena);
-        esmagada[n] = false;
         n++;
     }
     
@@ -577,7 +573,6 @@ static void tratar_comando_calc(FILA arena, Chao chao, double* pontuacao_total,
                 nova_anot->x = x_esmag;
                 nova_anot->y = y_esmag;
                 
-                esmagada[i] = true;
                 destruir_forma_completa(forma_i);
                 formas[i] = NULL;
                 
